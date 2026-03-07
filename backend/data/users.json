@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Admin",
+    "rollNo": "ADMIN",
+    "password": "admin123",
+    "role": "admin"
+  },
+  {
+    "name": "Prof Sharma",
+    "rollNo": "TEACH01",
+    "password": "teach123",
+    "role": "teacher"
+  },
+  {
+    "name": "Rahul",
+    "rollNo": "STU001",
+    "password": "1234",
+    "role": "student"
+  }
+]

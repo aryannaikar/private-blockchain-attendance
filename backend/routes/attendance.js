@@ -1,0 +1,124 @@
+const express = require("express");
+const router = express.Router();
+const contract = require("../contract");
+
+// MARK ATTENDANCE
+router.post("/mark", async (req, res) => {
+
+  try {
+
+    const { role, rollNo, studentID } = req.body;
+
+    let idToMark;
+
+    // STUDENT marking own attendance
+    if (role === "student") {
+
+      if (!rollNo) {
+        return res.status(400).json({
+          error: "rollNo required"
+        });
+      }
+
+      idToMark = rollNo;
+    }
+
+    // TEACHER marking any student
+    else if (role === "teacher") {
+
+      if (!studentID) {
+        return res.status(400).json({
+          error: "studentID required"
+        });
+      }
+
+      idToMark = studentID;
+    }
+
+    else {
+      return res.status(403).json({
+        error: "Unauthorized role"
+      });
+    }
+
+    const tx = await contract.markAttendance(idToMark);
+    await tx.wait();
+
+    res.json({
+      message: "Attendance marked",
+      txHash: tx.hash
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+
+// GET ALL ATTENDANCE (Teacher)
+router.get("/all", async (req, res) => {
+
+  try {
+
+    const records = await contract.getAttendance();
+
+    const formatted = records.map(r => ({
+      studentID: r.studentID,
+      timestamp: Number(r.timestamp),
+      blockNumber: Number(r.blockNumber),
+      markedBy: r.markedBy
+    }));
+
+    res.json(formatted);
+
+  } catch (err) {
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+
+// STUDENT VIEW OWN
+router.get("/my/:rollNo", async (req, res) => {
+
+  try {
+
+    const rollNo = req.params.rollNo;
+
+    const records = await contract.getAttendance();
+
+    const filtered = records.filter(
+      r => r.studentID === rollNo
+    );
+
+    const formatted = filtered.map(r => ({
+      studentID: r.studentID,
+      timestamp: Number(r.timestamp),
+      blockNumber: Number(r.blockNumber),
+      markedBy: r.markedBy
+    }));
+
+    res.json(formatted);
+
+  } catch (err) {
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+module.exports = router;

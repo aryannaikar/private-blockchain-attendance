@@ -1,0 +1,25 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "teacher": "dotenv -e .env.teacher node server.js",
+    "student": "dotenv -e .env.student node server.js",
+    "servernode": "dotenv -e .env.server node server.js",
+    "unauthorized": "dotenv -e .env.unauthorized node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "dotenv-cli": "^11.0.0",
+    "ethers": "^6.16.0",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

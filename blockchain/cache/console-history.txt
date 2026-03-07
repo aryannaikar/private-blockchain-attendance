@@ -1,0 +1,18 @@
+await contract.registerTeacher("0x70997970C51812dc3A010C7d01b50e0d17dc79C8")
+const contract = Attendance.attach(address)
+const Attendance = await ethers.getContractFactory("Attendance")
+const address = "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+await contract.registerTeacher("0x70997970C51812dc3A010C7d01b50e0d17dc79C8")
+const contract = await Attendance.attach("0x5fbdb2315678afecb367f032d93f642f64180aa3")
+const Attendance = await ethers.getContractFactory("Attendance")
+await attendance.connect(unauthorized).markAttendance("STUDENT_002");
+await attendance.connect(teacher).markAttendance("STUDENT_001");
+await attendance.connect(admin).registerTeacher(teacher.address);
+const unauthorized = accounts[3];
+const server = accounts[2];
+const teacher = accounts[1];
+const admin = accounts[0];
+const accounts = await ethers.getSigners();
+const attendance = await Attendance.attach(contractAddress);
+const Attendance = await ethers.getContractFactory("Attendance");
+const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
