@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button } from "react-native";
-import API from "../../service/api";
+import API from "../../config/api";
 
 export default function LoginScreen({ navigation }) {
 

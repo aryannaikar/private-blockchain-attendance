@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button } from "react-native";
 import styles from "./TeacherDashboardStyle";
-import API from "../../service/api";
+import API from "../../config/api";
 
 export default function TeacherDashboard({ navigation }) {
 

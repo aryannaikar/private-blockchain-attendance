@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Button } from "react-native";
-import API from "../../service/api";
+import API from "../../config/api";
 
 export default function StudentDashboard({ route }) {
 

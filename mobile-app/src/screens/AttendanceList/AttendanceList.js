@@ -2,7 +2,7 @@ import React, { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { View, FlatList, Text, Button } from "react-native";
 import styles from "./AttendanceListStyle";
-import API from "../../service/api";
+import API from "../../config/api";
 import AttendanceCard from "../../components/AttendanceCard/AttendanceCard";
 
 import { NODE_NAME } from "../../config/api";
