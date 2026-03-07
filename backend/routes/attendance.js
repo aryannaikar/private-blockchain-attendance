@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const contract = require("../contract");
+const checkRole = require("../middleware/checkRole");
 
-// MARK ATTENDANCE
-router.post("/mark", async (req, res) => {
+// MARK ATTENDANCE — role must match node's configured ROLE env
+router.post("/mark", checkRole, async (req, res) => {
 
   try {
 

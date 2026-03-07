@@ -12,14 +12,29 @@ async function main() {
 
   console.log("Attendance Contract Deployed To:", contractAddress);
 
-  // Hardhat Account #1 (Teacher)
+
+  // Hardhat accounts
   const teacherAddress = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
+  const studentAddress = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC";
+
 
   // Register teacher
-  const tx = await attendance.registerTeacher(teacherAddress);
-  await tx.wait();
+  const tx1 = await attendance.registerTeacher(teacherAddress);
+  await tx1.wait();
 
   console.log("Teacher registered:", teacherAddress);
+
+
+  // Register student
+  const tx2 = await attendance.registerStudent(
+    studentAddress,
+    "STU001"
+  );
+
+  await tx2.wait();
+
+  console.log("Student registered:", studentAddress, "→ STU001");
+
 }
 
 main().catch((error) => {

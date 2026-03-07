@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\admin\\OneDrive\\Desktop\\vs\\private-blockchain-attendance\\blockchain\\contracts\\Attendance.sol": {
-      "lastModificationDate": 1772787476609,
-      "contentHash": "5801ae3f176508e0fdf30b41b6231245",
+      "lastModificationDate": 1772910729476,
+      "contentHash": "c84429755903b068191e9cee6ec8f65c",
       "sourceName": "contracts/Attendance.sol",
       "solcConfig": {
         "version": "0.8.20",
