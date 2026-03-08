@@ -1,0 +1,59 @@
+.sidebar {
+  width: 250px;
+  height: calc(100vh - 70px); /* Assuming navbar is 70px top */
+  position: fixed;
+  left: 0;
+  top: 70px;
+  background-color: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.02);
+}
+
+.sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-role {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 20px;
+  color: var(--danger);
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+}
