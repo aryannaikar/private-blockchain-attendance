@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const users = require("../data/users.json");
+const fs = require("fs");
+const path = require("path");
+const { db } = require("../firebase");
 
-router.post("/login", (req, res) => {
+const usersPath = path.join(__dirname, "../data/users.json");
+
+router.post("/login", async (req, res) => {
 
   try {
 
@@ -14,9 +18,26 @@ router.post("/login", (req, res) => {
       });
     }
 
-    const user = users.find(
-      u => u.rollNo === rollNo && u.password === password
-    );
+    let user = null;
+
+    // 1. Try Firebase first
+    if (db) {
+      const userDoc = await db.collection("users").doc(rollNo).get();
+      if (userDoc.exists) {
+        const u = userDoc.data();
+        if (u.password === password) {
+          user = u;
+        }
+      }
+    }
+    
+    // 2. Fallback to local JSON if Firebase missing OR if user wasn't found in Firebase
+    if (!user) {
+      const localUsers = JSON.parse(fs.readFileSync(usersPath));
+      user = localUsers.find(
+        u => u.rollNo === rollNo && u.password === password
+      );
+    }
 
     if (!user) {
       return res.status(401).json({

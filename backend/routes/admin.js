@@ -2,25 +2,28 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const path = require("path");
+const { db } = require("../firebase");
 
 const usersPath = path.join(__dirname, "../data/users.json");
 
 // CREATE STUDENT
-router.post("/create-student", (req, res) => {
+router.post("/create-student", async (req, res) => {
 
   try {
 
     const { name, rollNo, password } = req.body;
 
-    if (!name || !rollNo || !password) {
-      return res.status(400).json({
-        error: "name, rollNo and password required"
-      });
+    let exists = false;
+
+    // 1. If Firebase is configured, check there
+    if (db) {
+      const userDoc = await db.collection("users").doc(rollNo).get();
+      if (userDoc.exists) exists = true;
+    } else {
+      // 2. Fallback to local JSON if Firebase is missing
+      const localUsers = JSON.parse(fs.readFileSync(usersPath));
+      if (localUsers.find(u => u.rollNo === rollNo)) exists = true;
     }
-
-    const users = JSON.parse(fs.readFileSync(usersPath));
-
-    const exists = users.find(u => u.rollNo === rollNo);
 
     if (exists) {
       return res.status(400).json({
@@ -32,12 +35,19 @@ router.post("/create-student", (req, res) => {
       name,
       rollNo,
       password,
-      role: "student"
+      role: "student",
+      createdAt: new Date().toISOString()
     };
 
-    users.push(newStudent);
-
-    fs.writeFileSync(usersPath, JSON.stringify(users, null, 2));
+    // Save to Firebase if available, otherwise save to local JSON
+    if (db) {
+      await db.collection("users").doc(rollNo).set(newStudent);
+    } else {
+      const localUsers = JSON.parse(fs.readFileSync(usersPath));
+      localUsers.push(newStudent);
+      fs.writeFileSync(usersPath, JSON.stringify(localUsers, null, 2));
+      console.log("Saved to local users.json (Firebase not configured)");
+    }
 
     res.json({
       message: "Student registered successfully",

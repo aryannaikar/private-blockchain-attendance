@@ -41,36 +41,16 @@ contract Attendance {
 
     function markAttendance(string memory _studentID) public {
 
-        // Teacher can mark anyone
-        if (teachers[msg.sender]) {
-
-            records.push(
-                AttendanceRecord({
-                    studentID: _studentID,
-                    timestamp: block.timestamp,
-                    blockNumber: block.number,
-                    markedBy: msg.sender
-                })
-            );
-
-        } 
-        else {
-
-            // Student can only mark their own ID
-            require(
-                keccak256(bytes(studentIDs[msg.sender])) == keccak256(bytes(_studentID)),
-                "Students can mark only their own attendance"
-            );
-
-            records.push(
-                AttendanceRecord({
-                    studentID: _studentID,
-                    timestamp: block.timestamp,
-                    blockNumber: block.number,
-                    markedBy: msg.sender
-                })
-            );
-        }
+        // The Node.js Backend handles Firebase Authentication.
+        // When it calls this function, it is pushing a verified record.
+        records.push(
+            AttendanceRecord({
+                studentID: _studentID,
+                timestamp: block.timestamp,
+                blockNumber: block.number,
+                markedBy: msg.sender
+            })
+        );
     }
 
     function getAttendance() public view returns (AttendanceRecord[] memory) {

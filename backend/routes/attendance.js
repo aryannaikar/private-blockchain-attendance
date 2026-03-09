@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const contract = require("../contract");
 const checkRole = require("../middleware/checkRole");
+const { db } = require("../firebase");
 
 // MARK ATTENDANCE — role must match node's configured ROLE env
 router.post("/mark", checkRole, async (req, res) => {
@@ -42,8 +43,19 @@ router.post("/mark", checkRole, async (req, res) => {
       });
     }
 
+    // 1. Immutable record on Blockchain
     const tx = await contract.markAttendance(idToMark);
     await tx.wait();
+
+    // 2. Fast-read record in Firebase Firestore
+    if (db) {
+      await db.collection("attendance").add({
+        studentID: idToMark,
+        timestamp: Date.now(),
+        txHash: tx.hash,
+        markedBy: role
+      });
+    }
 
     res.json({
       message: "Attendance marked",
@@ -67,17 +79,24 @@ router.post("/mark", checkRole, async (req, res) => {
 router.get("/all", async (req, res) => {
 
   try {
+    if (db) {
+      // Fast fetch from Firebase ⚡
+      const snapshot = await db.collection("attendance").orderBy("timestamp", "desc").get();
+      const records = snapshot.docs.map(doc => doc.data());
+      return res.json(records);
+    } else {
+      // Slow fallback to Blockchain 🐢
+      const records = await contract.getAttendance();
 
-    const records = await contract.getAttendance();
+      const formatted = records.map(r => ({
+        studentID: r.studentID,
+        timestamp: Number(r.timestamp),
+        blockNumber: Number(r.blockNumber),
+        markedBy: r.markedBy
+      }));
 
-    const formatted = records.map(r => ({
-      studentID: r.studentID,
-      timestamp: Number(r.timestamp),
-      blockNumber: Number(r.blockNumber),
-      markedBy: r.markedBy
-    }));
-
-    res.json(formatted);
+      return res.json(formatted);
+    }
 
   } catch (err) {
 
@@ -97,20 +116,29 @@ router.get("/my/:rollNo", async (req, res) => {
 
     const rollNo = req.params.rollNo;
 
-    const records = await contract.getAttendance();
+    if (db) {
+      // Fast fetch from Firebase ⚡
+      const snapshot = await db.collection("attendance").where("studentID", "==", rollNo).get();
+      // Sort in memory since firestore requires composite index for where+orderBy
+      const records = snapshot.docs.map(doc => doc.data()).sort((a,b) => b.timestamp - a.timestamp);
+      return res.json(records);
+    } else {
+      // Slow fallback to Blockchain 🐢
+      const records = await contract.getAttendance();
 
-    const filtered = records.filter(
-      r => r.studentID === rollNo
-    );
+      const filtered = records.filter(
+        r => r.studentID === rollNo
+      );
 
-    const formatted = filtered.map(r => ({
-      studentID: r.studentID,
-      timestamp: Number(r.timestamp),
-      blockNumber: Number(r.blockNumber),
-      markedBy: r.markedBy
-    }));
+      const formatted = filtered.map(r => ({
+        studentID: r.studentID,
+        timestamp: Number(r.timestamp),
+        blockNumber: Number(r.blockNumber),
+        markedBy: r.markedBy
+      }));
 
-    res.json(formatted);
+      return res.json(formatted);
+    }
 
   } catch (err) {
 
