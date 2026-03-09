@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { PlayCircle, Square, Bluetooth, Users, Clock, AlertCircle } from 'lucide-react';
+import { PlayCircle, Square, Bluetooth, Users, Clock, AlertCircle, Usb } from 'lucide-react';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import { markAttendanceTeacher } from '../../services/api';
 import './StartSession.css';
@@ -13,30 +13,121 @@ const StartSession = () => {
   const [manualRollNo,      setManualRollNo]      = useState('');
   const [statusMsg,         setStatusMsg]         = useState('');
   const [msgType,           setMsgType]           = useState(''); // success | error
+  
+  // Serial API States
+  const [port, setPort] = useState(null);
+  const [serialError, setSerialError] = useState('');
 
   const timerRef = useRef(null);
 
   // Derive ESP32 display status from session state
-  // (Browser cannot use Bluetooth Classic — teacher controls ESP32 via Serial Monitor)
-  const espStatus = sessionActive ? 'OPEN (BT)' : 'STANDBY';
+  const espStatus = sessionActive 
+    ? 'BROADCASTING' 
+    : port ? 'USB CONNECTED' : 'DISCONNECTED';
+
+  // Check if Web Serial is supported
+  const isSerialSupported = 'serial' in navigator;
 
   // Session countdown
   useEffect(() => {
     if (sessionActive && timeLeft > 0) {
       timerRef.current = setInterval(() => setTimeLeft(p => p - 1), 1000);
     } else if (timeLeft === 0) {
-      setSessionActive(false);
+      if (sessionActive) {
+        // Automatically close when time runs out
+        endSession();
+      }
     }
     return () => clearInterval(timerRef.current);
   }, [sessionActive, timeLeft]);
 
-  const toggleSession = () => {
-    if (!sessionActive) {
+  // Auto-reconnect to previously authorized ports on load
+  useEffect(() => {
+    if (isSerialSupported) {
+      navigator.serial.getPorts().then(async (ports) => {
+        if (ports.length > 0) {
+          try {
+            const autoPort = ports[0];
+            await autoPort.open({ baudRate: 115200 });
+            setPort(autoPort);
+          } catch (err) {
+            console.error("Auto-connect failed:", err);
+          }
+        }
+      });
+    }
+  }, [isSerialSupported]);
+
+  // Connect to ESP32 via USB
+  const connectSerial = async () => {
+    setSerialError('');
+    try {
+      const selectedPort = await navigator.serial.requestPort();
+      await selectedPort.open({ baudRate: 115200 }); // Standard ESP32 baud rate
+      setPort(selectedPort);
+    } catch (err) {
+      setSerialError('Failed to connect: ' + err.message);
+    }
+  };
+
+  // Disconnect from ESP32
+  const disconnectSerial = async () => {
+    if (port) {
+      try {
+        await port.close();
+        setPort(null);
+        if (sessionActive) setSessionActive(false);
+      } catch (err) {
+        setSerialError('Failed to disconnect: ' + err.message);
+      }
+    }
+  };
+
+  // Helper to send a string command to the ESP32
+  const sendSerialCommand = async (command) => {
+    if (!port) {
+      setSerialError('ESP32 not connected. Please connect via USB first.');
+      return false;
+    }
+    
+    try {
+      const encoder = new TextEncoder();
+      const writer = port.writable.getWriter();
+      await writer.write(encoder.encode(command + '\n'));
+      writer.releaseLock();
+      return true;
+    } catch (err) {
+      setSerialError('Error sending command: ' + err.message);
+      return false;
+    }
+  };
+
+  const startSession = async () => {
+    setSerialError('');
+    if (!port) {
+        setSerialError("Please connect the ESP32 via USB first.");
+        return;
+    }
+    const success = await sendSerialCommand("OPEN");
+    if (success) {
       setTimeLeft(SESSION_DURATION);
       setSessionActive(true);
-    } else {
+    }
+  };
+
+  const endSession = async () => {
+    const success = await sendSerialCommand("CLOSE");
+    if (success || !port) { // IF port was disconnected, force end session anyway
       clearInterval(timerRef.current);
       setSessionActive(false);
+    }
+  };
+
+  const toggleSession = () => {
+    if (!sessionActive) {
+      startSession();
+    } else {
+      endSession();
     }
   };
 
@@ -69,14 +160,43 @@ const StartSession = () => {
           </div>
 
           <div className="session-body">
-            <div className="instructions-box">
-              <h3><Bluetooth size={20} /> ESP32 Mode: <strong style={{ color: '#6366F1' }}>BLUETOOTH</strong></h3>
-              <ol className="instructions-list">
-                <li>Power on the ESP32 and open <strong>Serial Monitor</strong> in Arduino IDE.</li>
-                <li>Type <strong>OPEN</strong> in Serial Monitor to start accepting attendance.</li>
-                <li>Click <em>Start Session</em> below — students have 3 minutes to mark via their phones.</li>
-                <li>Or use the manual form to mark a student by Roll No.</li>
-              </ol>
+            
+            {/* Serial Connection Panel */}
+            <div className="instructions-box" style={{ marginBottom: '24px' }}>
+              <h3 style={{ marginBottom: '12px' }}>
+                <Usb size={20} /> ESP32 Connection
+              </h3>
+              
+              {!isSerialSupported && (
+                <div style={{ color: '#EF4444', marginBottom: '10px', fontSize: '14px' }}>
+                  ⚠ Your browser does not support the Web Serial API. Please use Chrome or Edge to connect to the ESP32.
+                </div>
+              )}
+
+              {isSerialSupported && (
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  {!port ? (
+                    <button className="btn-primary-small" onClick={connectSerial}>
+                      Connect ESP32 (USB)
+                    </button>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#22C55E', fontWeight: '500' }}>
+                        <Bluetooth size={16} /> USB Connected
+                      </div>
+                      <button className="btn-secondary-icon" onClick={disconnectSerial} style={{ fontSize: '13px', padding: '6px 12px' }}>
+                        Disconnect
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {serialError && (
+                <div style={{ color: '#EF4444', marginTop: '10px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <AlertCircle size={14} /> {serialError}
+                </div>
+              )}
             </div>
 
             <motion.div
@@ -95,7 +215,7 @@ const StartSession = () => {
             <div className="live-stats">
               <div className="stat-pill">
                 <Bluetooth size={18} />
-                <span>ESP32: <strong style={{ color: sessionActive ? '#22C55E' : '#6B7280' }}>{espStatus}</strong></span>
+                <span>ESP32: <strong style={{ color: sessionActive ? '#22C55E' : (port ? '#6366F1' : '#6B7280') }}>{espStatus}</strong></span>
               </div>
               <div className="stat-pill">
                 <Clock size={18} />
@@ -106,12 +226,20 @@ const StartSession = () => {
             <button
               className={`btn-session ${sessionActive ? 'btn-end' : 'btn-start'}`}
               onClick={toggleSession}
+              disabled={!port}
+              style={{ opacity: !port ? 0.6 : 1, cursor: !port ? 'not-allowed' : 'pointer' }}
             >
               {sessionActive ? <><Square size={20} /> End Session</> : <><PlayCircle size={20} /> Start 3-Min Session</>}
             </button>
+            
+            {!port && (
+              <p style={{ textAlign: 'center', color: '#888', fontSize: '12px', marginTop: '8px' }}>
+                Connect the ESP32 via USB to start the session.
+              </p>
+            )}
 
             {/* Manual mark section */}
-            <div style={{ marginTop: '28px', borderTop: '1px solid #E5E7EB', paddingTop: '20px' }}>
+            <div style={{ marginTop: '28px', borderTop: '1px solid #E5E7EB', paddingTop: '20px', width: '100%' }}>
               <h3 style={{ fontSize: '15px', marginBottom: '10px' }}>Manual Mark by Roll No</h3>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <input
