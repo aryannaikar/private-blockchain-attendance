@@ -6,7 +6,13 @@
     "teacher": "dotenv -e .env.teacher node server.js",
     "student": "dotenv -e .env.student node server.js",
     "servernode": "dotenv -e .env.server node server.js",
-    "unauthorized": "dotenv -e .env.unauthorized node server.js"
+    "unauthorized": "dotenv -e .env.unauthorized node server.js",
+    "ngrok:all": "npx --yes ngrok start --all --config=ngrok.yml",
+    "ngrok:teacher": "npx --yes ngrok http 4000",
+    "ngrok:student": "npx --yes ngrok http 3001",
+    "ngrok:servernode": "npx --yes ngrok http 5000",
+    "ngrok:blockchain": "npx --yes ngrok http 8545",
+    "start:all": "npx --yes concurrently \"npm run teacher\" \"npm run student\" \"npm run servernode\" \"npm run unauthorized\""
   },
   "keywords": [],
   "author": "",

@@ -19,15 +19,18 @@ export default function LoginScreen({ navigation }) {
       const role = res.data.role;
 
       if (role === "student") {
-        navigation.navigate("StudentDashboard", { rollNo });
+        navigation.navigate("StudentRoot", {
+          screen: "Dashboard",
+          params: { rollNo }
+        });
       }
 
       else if (role === "teacher") {
-        navigation.navigate("TeacherDashboard");
+        navigation.navigate("TeacherRoot");
       }
 
       else if (role === "admin") {
-        alert("Admin dashboard not created yet");
+        navigation.navigate("AdminRoot");
       }
 
     } catch (error) {

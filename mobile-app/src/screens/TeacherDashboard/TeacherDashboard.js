@@ -134,7 +134,7 @@ export default function TeacherDashboard({ navigation }) {
       <View style={styles.btn}>
         <Button
           title="View All Attendance Records"
-          onPress={() => navigation.navigate("Attendance Records")}
+          onPress={() => navigation.navigate("AllAttendance")}
         />
       </View>
 

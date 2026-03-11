@@ -163,9 +163,7 @@ export default function StudentDashboard({ route, navigation }) {
       <View style={styles.btn}>
         <Button
           title="View My Attendance Records"
-          onPress={() =>
-            navigation.navigate("Attendance Records", { rollNo })
-          }
+          onPress={() => navigation.navigate("MyAttendance")}
         />
       </View>
 
