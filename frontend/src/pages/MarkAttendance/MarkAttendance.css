@@ -179,3 +179,19 @@
 .mt-4 {
   margin-top: 24px;
 }
+
+@media (max-width: 768px) {
+  .attendance-content {
+    padding: 20px;
+  }
+  .scanner-header {
+    padding: 20px;
+  }
+  .scanner-body {
+    padding: 30px 20px;
+    min-height: 300px;
+  }
+  .scanner-header h2 {
+    font-size: 1.25rem;
+  }
+}

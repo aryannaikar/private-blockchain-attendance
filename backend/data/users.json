@@ -29,5 +29,26 @@
     "password": "36",
     "role": "student",
     "createdAt": "2026-03-08T19:06:49.945Z"
+  },
+  {
+    "name": "suhas",
+    "rollNo": "SUHAS",
+    "password": "123",
+    "role": "teacher",
+    "createdAt": "2026-03-15T14:47:26.481Z"
+  },
+  {
+    "name": "Leena Patil",
+    "rollNo": "LEENA",
+    "password": "123",
+    "role": "teacher",
+    "createdAt": "2026-03-15T15:24:17.689Z"
+  },
+  {
+    "name": "siddhant",
+    "rollNo": "33",
+    "password": "123",
+    "role": "student",
+    "createdAt": "2026-03-15T16:27:27.913Z"
   }
 ]

@@ -1,23 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wifi, CheckCircle2, XCircle, Search, Link as LinkIcon } from 'lucide-react';
+import { CheckCircle2, XCircle, Search, Link as LinkIcon } from 'lucide-react';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import { markAttendanceStudent } from '../../services/api';
+import { getDeviceId } from '../../services/fingerprint';
 import './MarkAttendance.css';
 
 const MarkAttendance = () => {
   const rollNo = localStorage.getItem('rollNo') || '';
   const [scanState,  setScanState]  = useState('idle'); // idle | scanning | found | verifying | success | error
   const [txHash,     setTxHash]     = useState('');
-  const [blockNum,   setBlockNum]   = useState('');
+  const [sessionID, setSessionID] = useState('...');
+  const [teacherName, setTeacherName] = useState('...');
   const [sessionOpen, setSessionOpen] = useState(false);
   const [errorMsg,   setErrorMsg]   = useState('');
 
   // The Web Portal uses Node Verification, so we assume the session is open
   // and let the Blockchain/Student Node return an error if it's not.
   useEffect(() => {
-    setSessionOpen(true);
-  }, []);
+    const fetchSession = async () => {
+      try {
+        const { getActiveSession, getMyAttendance } = await import('../../services/api');
+        const res = await getActiveSession();
+        const slot = res.data.activeSlot;
+        setSessionID(slot);
+        setTeacherName(res.data.teacherName || 'Teacher');
+        setSessionOpen(true);
+
+        // Check if already marked for this session
+        const historyRes = await getMyAttendance(rollNo);
+        const alreadyPresent = historyRes.data.find(r => r.sessionID === slot);
+        if (alreadyPresent) {
+          setScanState('success');
+          setTxHash(alreadyPresent.txHash || 'ALREADY_RECORDED');
+        }
+      } catch (err) {
+        console.error("Failed to fetch session:", err);
+        setSessionOpen(false);
+      }
+    };
+    fetchSession();
+  }, [rollNo]);
 
   const startScan = async () => {
     setScanState('scanning');
@@ -55,9 +78,11 @@ const MarkAttendance = () => {
       setScanState('verifying');
 
       try {
-        const res = await markAttendanceStudent(rollNo);
+        // Grab device fingerprint silently
+        const deviceID = await getDeviceId();
+
+        const res = await markAttendanceStudent(rollNo, deviceID, sessionID);
         setTxHash(res.data.txHash || '');
-        setBlockNum('');
         setScanState('success');
       } catch (err) {
         const msg = err?.response?.data?.error || 'Failed to record attendance. Try again.';
@@ -76,6 +101,14 @@ const MarkAttendance = () => {
           <div className="scanner-header">
             <h2>IoT Attendance Verification</h2>
             <p>Connect to the classroom ESP32 device to verify your physical presence.</p>
+            <div style={{ marginTop: '12px', display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <div style={{ padding: '6px 12px', borderRadius: '12px', backgroundColor: '#EEF2FF', color: '#6366F1', fontWeight: '600', fontSize: '14px' }}>
+                Slot: {sessionID}
+              </div>
+              <div style={{ padding: '6px 12px', borderRadius: '12px', backgroundColor: '#F0FDF4', color: '#166534', fontWeight: '600', fontSize: '14px' }}>
+                With: {teacherName}
+              </div>
+            </div>
             {!sessionOpen && (
               <p style={{ color: '#EF4444', marginTop: '6px', fontSize: '14px' }}>
                 ⚠ No active session detected. Session may not be open yet.

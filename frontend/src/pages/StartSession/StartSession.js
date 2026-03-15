@@ -1,24 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { PlayCircle, Square, Bluetooth, Users, Clock, AlertCircle, Usb } from 'lucide-react';
+import { PlayCircle, Square, Bluetooth, Users, Clock, AlertCircle, Usb, Trash2, Layers } from 'lucide-react';
 import Sidebar from '../../components/Sidebar/Sidebar';
-import { markAttendanceTeacher } from '../../services/api';
+import { markAttendanceTeacher, getActiveSession, setActiveSession, resetAttendance } from '../../services/api';
 import './StartSession.css';
 
-const SESSION_DURATION = 180; // seconds
+const CLASS_SLOTS = ["Class 1", "Class 2", "Class 3", "Class 4", "Class 5"];
 
 const StartSession = () => {
   const [sessionActive,     setSessionActive]     = useState(false);
-  const [timeLeft,          setTimeLeft]          = useState(SESSION_DURATION);
   const [manualRollNo,      setManualRollNo]      = useState('');
   const [statusMsg,         setStatusMsg]         = useState('');
   const [msgType,           setMsgType]           = useState(''); // success | error
+  const [activeSlot,        setActiveSlot]        = useState('Class 1');
   
   // Serial API States
   const [port, setPort] = useState(null);
   const [serialError, setSerialError] = useState('');
-
-  const timerRef = useRef(null);
 
   // Derive ESP32 display status from session state
   const espStatus = sessionActive 
@@ -28,18 +26,19 @@ const StartSession = () => {
   // Check if Web Serial is supported
   const isSerialSupported = 'serial' in navigator;
 
-  // Session countdown
+  // Load active session status from backend on mount
   useEffect(() => {
-    if (sessionActive && timeLeft > 0) {
-      timerRef.current = setInterval(() => setTimeLeft(p => p - 1), 1000);
-    } else if (timeLeft === 0) {
-      if (sessionActive) {
-        // Automatically close when time runs out
-        endSession();
+    const fetchSession = async () => {
+      try {
+        const res = await getActiveSession();
+        setActiveSlot(res.data.activeSlot || 'Class 1');
+        setSessionActive(res.data.isOpen || false);
+      } catch (err) {
+        console.error("Failed to fetch session:", err);
       }
-    }
-    return () => clearInterval(timerRef.current);
-  }, [sessionActive, timeLeft]);
+    };
+    fetchSession();
+  }, []);
 
   // Auto-reconnect to previously authorized ports on load
   useEffect(() => {
@@ -50,6 +49,12 @@ const StartSession = () => {
             const autoPort = ports[0];
             await autoPort.open({ baudRate: 115200 });
             setPort(autoPort);
+            // If session was active on backend, signal ESP to OPEN
+            const res = await getActiveSession();
+            if (res.data.isOpen) {
+               // Send OPEN command to ESP just in case it was reset
+               sendSerialToPort(autoPort, "OPEN");
+            }
           } catch (err) {
             console.error("Auto-connect failed:", err);
           }
@@ -63,8 +68,9 @@ const StartSession = () => {
     setSerialError('');
     try {
       const selectedPort = await navigator.serial.requestPort();
-      await selectedPort.open({ baudRate: 115200 }); // Standard ESP32 baud rate
+      await selectedPort.open({ baudRate: 115200 });
       setPort(selectedPort);
+      // Persist that we chose this port? (Browser handles this via getPorts usually)
     } catch (err) {
       setSerialError('Failed to connect: ' + err.message);
     }
@@ -76,29 +82,52 @@ const StartSession = () => {
       try {
         await port.close();
         setPort(null);
-        if (sessionActive) setSessionActive(false);
       } catch (err) {
         setSerialError('Failed to disconnect: ' + err.message);
       }
     }
   };
 
-  // Helper to send a string command to the ESP32
+  // Helper to send a string command to the ESP32 (internal version)
+  const sendSerialToPort = async (activePort, command) => {
+    if (!activePort) return false;
+    try {
+      const encoder = new TextEncoder();
+      const writer = activePort.writable.getWriter();
+      await writer.write(encoder.encode(command + '\n'));
+      writer.releaseLock();
+      return true;
+    } catch (err) {
+      console.error('Serial send error:', err);
+      return false;
+    }
+  };
+
   const sendSerialCommand = async (command) => {
     if (!port) {
       setSerialError('ESP32 not connected. Please connect via USB first.');
       return false;
     }
-    
+    return sendSerialToPort(port, command);
+  };
+
+  const handleSlotChange = async (slot) => {
+    if (sessionActive) return;
     try {
-      const encoder = new TextEncoder();
-      const writer = port.writable.getWriter();
-      await writer.write(encoder.encode(command + '\n'));
-      writer.releaseLock();
-      return true;
+      const teacherID = localStorage.getItem('rollNo');
+      const teacherName = localStorage.getItem('name');
+      await setActiveSession({ 
+        activeSlot: slot,
+        teacherID,
+        teacherName,
+        isOpen: false // Slot change always starts with session closed
+      });
+      setActiveSlot(slot);
+      setStatusMsg(`Success: ${slot} selected for Prof. ${teacherName}`);
+      setMsgType('success');
     } catch (err) {
-      setSerialError('Error sending command: ' + err.message);
-      return false;
+      setStatusMsg("Failed to update class slot.");
+      setMsgType('error');
     }
   };
 
@@ -108,18 +137,52 @@ const StartSession = () => {
         setSerialError("Please connect the ESP32 via USB first.");
         return;
     }
-    const success = await sendSerialCommand("OPEN");
-    if (success) {
-      setTimeLeft(SESSION_DURATION);
-      setSessionActive(true);
+    
+    try {
+      const teacherID = localStorage.getItem('rollNo');
+      const teacherName = localStorage.getItem('name');
+      
+      // Update backend BEFORE signaling ESP
+      await setActiveSession({
+        activeSlot,
+        teacherID,
+        teacherName,
+        isOpen: true
+      });
+
+      const success = await sendSerialCommand("OPEN");
+      if (success) {
+        setSessionActive(true);
+        setStatusMsg(`Attendance session started for ${activeSlot}`);
+        setMsgType('success');
+      }
+    } catch (err) {
+      setStatusMsg("Failed to start session on backend.");
+      setMsgType('error');
     }
   };
 
   const endSession = async () => {
-    const success = await sendSerialCommand("CLOSE");
-    if (success || !port) { // IF port was disconnected, force end session anyway
-      clearInterval(timerRef.current);
+    try {
+      const teacherID = localStorage.getItem('rollNo');
+      const teacherName = localStorage.getItem('name');
+
+      await setActiveSession({
+        activeSlot,
+        teacherID,
+        teacherName,
+        isOpen: false
+      });
+
+      const success = await sendSerialCommand("CLOSE");
       setSessionActive(false);
+      setStatusMsg(`Session closed for ${activeSlot}`);
+      setMsgType('success');
+    } catch (err) {
+      // Even if serial fails, we end session on UI/Backend
+      setSessionActive(false);
+      setStatusMsg("Session ended (Serial sync may have failed).");
+      setMsgType('error');
     }
   };
 
@@ -131,8 +194,18 @@ const StartSession = () => {
     }
   };
 
+  const handleReset = async () => {
+    if (!window.confirm("Are you sure? This will clear all local attendance records (the blockchain record remains).")) return;
+    try {
+      await resetAttendance();
+      setStatusMsg("✅ Local records reset successfully.");
+      setMsgType('success');
+    } catch (err) {
+      setStatusMsg("❌ Failed to reset records.");
+      setMsgType('error');
+    }
+  };
 
-  // Teacher manually marks a student on Teacher Node
   const markManual = async () => {
     if (!manualRollNo.trim()) return;
     try {
@@ -146,8 +219,6 @@ const StartSession = () => {
     }
   };
 
-  const formatTime = (s) => `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
-
   return (
     <div className="dashboard-layout">
       <Sidebar role="teacher" />
@@ -155,21 +226,58 @@ const StartSession = () => {
       <main className="dashboard-content session-content">
         <div className="session-card">
           <div className="session-header">
-            <h2>Start Attendance Session</h2>
-            <p>Broadcast network for students to verify presence.</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <h2>Attendance Session</h2>
+                <p>Manage real-time attendance broadcasting.</p>
+              </div>
+              <button className="btn-secondary-icon" onClick={handleReset} title="Clear local records">
+                <Trash2 size={16} /> Reset
+              </button>
+            </div>
           </div>
 
           <div className="session-body">
             
+            {/* Class Slot Selection */}
+            <div className="instructions-box" style={{ marginBottom: '24px', borderLeft: '4px solid #6366F1' }}>
+              <h3 style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Layers size={20} color="#6366F1" /> Class Slot
+              </h3>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {CLASS_SLOTS.map(slot => (
+                  <button
+                    key={slot}
+                    disabled={sessionActive}
+                    onClick={() => handleSlotChange(slot)}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '20px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: sessionActive ? 'not-allowed' : 'pointer',
+                      backgroundColor: activeSlot === slot ? '#6366F1' : '#F3F4F6',
+                      color: activeSlot === slot ? '#FFFFFF' : '#4B5563',
+                      border: 'none',
+                      transition: 'all 0.2s',
+                      opacity: sessionActive && activeSlot !== slot ? 0.5 : 1
+                    }}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Serial Connection Panel */}
             <div className="instructions-box" style={{ marginBottom: '24px' }}>
               <h3 style={{ marginBottom: '12px' }}>
-                <Usb size={20} /> ESP32 Connection
+                <Usb size={20} /> ESP32 Status
               </h3>
               
               {!isSerialSupported && (
                 <div style={{ color: '#EF4444', marginBottom: '10px', fontSize: '14px' }}>
-                  ⚠ Your browser does not support the Web Serial API. Please use Chrome or Edge to connect to the ESP32.
+                  ⚠ Web Serial API not supported in this browser.
                 </div>
               )}
 
@@ -177,7 +285,7 @@ const StartSession = () => {
                 <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   {!port ? (
                     <button className="btn-primary-small" onClick={connectSerial}>
-                      Connect ESP32 (USB)
+                      Connect ESP32
                     </button>
                   ) : (
                     <>
@@ -208,18 +316,18 @@ const StartSession = () => {
               }}
               transition={{ repeat: sessionActive ? Infinity : 0, duration: 2 }}
             >
-              <span className="time-display">{formatTime(timeLeft)}</span>
-              <span className="time-label">{sessionActive ? 'Session Running' : 'Ready'}</span>
+              <Clock size={40} color={sessionActive ? '#22C55E' : '#6B7280'} />
+              <span className="time-label" style={{ marginTop: '12px' }}>{sessionActive ? `${activeSlot} ON` : 'OFF'}</span>
             </motion.div>
 
             <div className="live-stats">
               <div className="stat-pill">
                 <Bluetooth size={18} />
-                <span>ESP32: <strong style={{ color: sessionActive ? '#22C55E' : (port ? '#6366F1' : '#6B7280') }}>{espStatus}</strong></span>
+                <span>ESP: <strong style={{ color: sessionActive ? '#22C55E' : (port ? '#6366F1' : '#6B7280') }}>{espStatus}</strong></span>
               </div>
               <div className="stat-pill">
-                <Clock size={18} />
-                <span>{sessionActive ? 'Session Running' : 'Session Idle'}</span>
+                <Users size={18} />
+                <span>Slot: <strong>{activeSlot}</strong></span>
               </div>
             </div>
 
@@ -229,22 +337,16 @@ const StartSession = () => {
               disabled={!port}
               style={{ opacity: !port ? 0.6 : 1, cursor: !port ? 'not-allowed' : 'pointer' }}
             >
-              {sessionActive ? <><Square size={20} /> End Session</> : <><PlayCircle size={20} /> Start 3-Min Session</>}
+              {sessionActive ? <><Square size={20} /> End Session</> : <><PlayCircle size={20} /> Start Session</>}
             </button>
             
-            {!port && (
-              <p style={{ textAlign: 'center', color: '#888', fontSize: '12px', marginTop: '8px' }}>
-                Connect the ESP32 via USB to start the session.
-              </p>
-            )}
-
             {/* Manual mark section */}
             <div style={{ marginTop: '28px', borderTop: '1px solid #E5E7EB', paddingTop: '20px', width: '100%' }}>
-              <h3 style={{ fontSize: '15px', marginBottom: '10px' }}>Manual Mark by Roll No</h3>
+              <h3 style={{ fontSize: '15px', marginBottom: '10px' }}>Manual Attendance</h3>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <input
                   type="text"
-                  placeholder="e.g. STU001"
+                  placeholder="Student Roll No"
                   value={manualRollNo}
                   onChange={e => setManualRollNo(e.target.value.toUpperCase())}
                   style={{ flex: 1, padding: '8px 12px', border: '1px solid #D1D5DB', borderRadius: '8px', fontSize: '14px' }}

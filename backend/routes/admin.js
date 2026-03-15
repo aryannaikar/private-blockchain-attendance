@@ -6,12 +6,16 @@ const { db } = require("../firebase");
 
 const usersPath = path.join(__dirname, "../data/users.json");
 
-// CREATE STUDENT
-router.post("/create-student", async (req, res) => {
+// CREATE USER (STUDENT OR TEACHER)
+router.post("/create-user", async (req, res) => {
 
   try {
 
-    const { name, rollNo, password } = req.body;
+    const { name, rollNo, password, role } = req.body;
+
+    if (!role || !["student", "teacher"].includes(role)) {
+      return res.status(400).json({ error: "Invalid role specified" });
+    }
 
     let exists = false;
 
@@ -27,31 +31,31 @@ router.post("/create-student", async (req, res) => {
 
     if (exists) {
       return res.status(400).json({
-        error: "Roll number already exists"
+        error: "ID (Roll No/Teacher ID) already exists"
       });
     }
 
-    const newStudent = {
+    const newUser = {
       name,
       rollNo,
       password,
-      role: "student",
+      role,
       createdAt: new Date().toISOString()
     };
 
     // Save to Firebase if available, otherwise save to local JSON
     if (db) {
-      await db.collection("users").doc(rollNo).set(newStudent);
+      await db.collection("users").doc(rollNo).set(newUser);
     } else {
       const localUsers = JSON.parse(fs.readFileSync(usersPath));
-      localUsers.push(newStudent);
+      localUsers.push(newUser);
       fs.writeFileSync(usersPath, JSON.stringify(localUsers, null, 2));
-      console.log("Saved to local users.json (Firebase not configured)");
+      console.log(`Saved to local users.json: ${role} registered`);
     }
 
     res.json({
-      message: "Student registered successfully",
-      student: newStudent
+      message: `${role.charAt(0).toUpperCase() + role.slice(1)} registered successfully`,
+      user: newUser
     });
 
   } catch (err) {
@@ -64,6 +68,23 @@ router.post("/create-student", async (req, res) => {
 
   }
 
+});
+
+// GET ALL USERS (Admin)
+router.get("/users", async (req, res) => {
+  try {
+    let users = [];
+    if (db) {
+      const snapshot = await db.collection("users").get();
+      users = snapshot.docs.map(doc => doc.data());
+    } else {
+      users = JSON.parse(fs.readFileSync(usersPath));
+    }
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
 });
 
 module.exports = router;

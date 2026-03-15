@@ -8,7 +8,7 @@
 }
 
 .users-header {
-  padding: 20px 24px;
+  padding: 24px;
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
@@ -38,25 +38,16 @@
   margin-left: 8px;
 }
 
-.filter-select {
-  padding: 10px 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-family: inherit;
-  background: var(--background);
-  color: var(--text-primary);
-  outline: none;
-  cursor: pointer;
-}
-
 .table-responsive {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .users-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 600px; /* Force scroll on mobile to keep structure */
 }
 
 .users-table th {
@@ -100,47 +91,23 @@
   color: var(--accent);
 }
 
-.status-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-
-.actions-cell {
-  display: flex;
-  gap: 8px;
-}
-
-.icon-btn {
+.user-avatar {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--background);
-  color: var(--text-secondary);
-  transition: all 0.2s;
-  border: 1px solid transparent;
 }
 
-.icon-btn:hover {
-  border-color: var(--border);
-}
-
-.edit-btn:hover {
-  color: var(--primary);
-  background: rgba(99, 102, 241, 0.05);
-}
-
-.disable-btn:hover {
-  color: var(--danger);
-  background: rgba(239, 68, 68, 0.05);
-}
+.user-avatar.student { background: rgba(99, 102, 241, 0.1); color: var(--primary); }
+.user-avatar.teacher { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
 
 @media (max-width: 768px) {
+  .users-header {
+    padding: 16px;
+    gap: 16px;
+  }
   .search-wrapper.border {
     width: 100%;
   }

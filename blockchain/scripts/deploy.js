@@ -1,4 +1,6 @@
 const hre = require("hardhat");
+const fs = require("fs");
+const path = require("path");
 
 async function main() {
 
@@ -11,6 +13,28 @@ async function main() {
   const contractAddress = await attendance.getAddress();
 
   console.log("Attendance Contract Deployed To:", contractAddress);
+
+
+  // --- AUTOMATION: Update Backend .env files ---
+  const backendDir = path.join(__dirname, "../../backend");
+  if (fs.existsSync(backendDir)) {
+    const envFiles = fs.readdirSync(backendDir).filter(f => f.startsWith(".env"));
+    
+    envFiles.forEach(file => {
+      const filePath = path.join(backendDir, file);
+      let content = fs.readFileSync(filePath, "utf8");
+      
+      if (content.includes("CONTRACT_ADDRESS=")) {
+        content = content.replace(/CONTRACT_ADDRESS=0x[a-fA-F0-9]{40}/g, `CONTRACT_ADDRESS=${contractAddress}`);
+        // Fallback for empty or different format
+        if (!content.includes(`CONTRACT_ADDRESS=${contractAddress}`)) {
+            content = content.replace(/CONTRACT_ADDRESS=.*/g, `CONTRACT_ADDRESS=${contractAddress}`);
+        }
+        fs.writeFileSync(filePath, content);
+        console.log(`Updated ${file} with new contract address.`);
+      }
+    });
+  }
 
 
   // Hardhat accounts

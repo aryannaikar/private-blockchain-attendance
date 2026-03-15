@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, 
   CheckSquare, 
@@ -8,13 +8,16 @@ import {
   LogOut, 
   PlayCircle, 
   Users, 
-  History
+  History,
+  Menu,
+  X
 } from 'lucide-react';
 import NavLink from '../NavLink/NavLink';
 import './Sidebar.css';
 
 const Sidebar = ({ role }) => {
   const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -47,32 +50,56 @@ const Sidebar = ({ role }) => {
     return [];
   };
 
-  return (
-    <motion.aside 
-      className="sidebar"
-      initial={{ x: -250 }}
-      animate={{ x: 0 }}
-      transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-    >
-      <div className="sidebar-header">
-        <h2 className="sidebar-role">{role?.charAt(0).toUpperCase() + role?.slice(1)} Portal</h2>
-      </div>
-      
-      <div className="sidebar-nav">
-        {getLinks().map((link) => (
-          <NavLink key={link.to} to={link.to} icon={link.icon}>
-            {link.label}
-          </NavLink>
-        ))}
-      </div>
+  const toggleMobile = () => setMobileOpen(!mobileOpen);
 
-      <div className="sidebar-footer">
-        <button className="logout-btn" onClick={handleLogout}>
-          <LogOut size={20} />
-          <span>Logout</span>
-        </button>
-      </div>
-    </motion.aside>
+  return (
+    <>
+      {/* Mobile Hamburger Button */}
+      <button className="mobile-toggle" onClick={toggleMobile}>
+        {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Mobile Overlay */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div 
+            className="sidebar-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMobileOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.aside 
+        className={`sidebar ${mobileOpen ? 'open' : ''}`}
+        initial={false}
+        animate={{ x: 0 }}
+        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+      >
+        <div className="sidebar-header">
+          <h2 className="sidebar-role">{role?.charAt(0).toUpperCase() + role?.slice(1)} Portal</h2>
+        </div>
+        
+        <div className="sidebar-nav">
+          {getLinks().map((link) => (
+            <div key={link.to} onClick={() => setMobileOpen(false)}>
+              <NavLink to={link.to} icon={link.icon}>
+                {link.label}
+              </NavLink>
+            </div>
+          ))}
+        </div>
+
+        <div className="sidebar-footer">
+          <button className="logout-btn" onClick={handleLogout}>
+            <LogOut size={20} />
+            <span>Logout</span>
+          </button>
+        </div>
+      </motion.aside>
+    </>
   );
 };
 

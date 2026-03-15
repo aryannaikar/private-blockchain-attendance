@@ -1,56 +1,66 @@
-.table-container {
-  background-color: var(--card);
-  border-radius: var(--radius);
+.table-container.premium-shadow {
+  background: var(--card);
+  border-radius: 16px;
   border: 1px solid var(--border);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   margin-top: 24px;
 }
 
 .table-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
+  padding: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  gap: 20px;
   flex-wrap: wrap;
-  gap: 16px;
 }
 
 .table-title {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--text-primary);
+  margin: 0;
+}
+
+.table-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 4px 0 0 0;
 }
 
 .search-box {
-  display: flex;
-  align-items: center;
-  background-color: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 12px;
-  width: 300px;
-  transition: border-color 0.2s;
-}
-
-.search-box:focus-within {
-  border-color: var(--primary);
+  position: relative;
+  width: 100%;
+  max-width: 400px;
 }
 
 .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--text-secondary);
-  margin-right: 8px;
+  pointer-events: none;
 }
 
 .search-box input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-family: inherit;
-  font-size: 0.9rem;
   width: 100%;
-  color: var(--text-primary);
+  padding: 12px 12px 12px 40px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f9fafb;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.search-box input:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
 .table-wrapper {
@@ -64,60 +74,124 @@
 }
 
 .attendance-table th {
-  background-color: #F9FAFB;
-  padding: 12px 24px;
-  font-size: 0.8rem;
+  padding: 16px 24px;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  background: #fcfcfd;
   border-bottom: 1px solid var(--border);
+}
+
+.attendance-table th svg {
+  vertical-align: middle;
+  margin-right: 6px;
+  opacity: 0.7;
+}
+
+.table-row {
+  transition: background 0.1s;
+}
+
+.table-row:hover {
+  background: #f8fafc;
 }
 
 .attendance-table td {
   padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
   font-size: 0.9rem;
   color: var(--text-primary);
-  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
 }
 
-.attendance-table tbody tr {
-  transition: background-color 0.15s;
+.student-id-cell {
+  font-weight: 600;
+  color: var(--primary);
 }
 
-.attendance-table tbody tr:hover {
-  background-color: #F9FAFB;
+.session-pill {
+  display: inline-flex;
+  padding: 4px 12px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
-.attendance-table tbody tr:last-child td {
-  border-bottom: none;
+.session-pill.placeholder {
+  background: transparent;
+  color: #9ca3af;
+  padding: 0;
 }
 
-.mono {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
+.teacher-name {
+  color: #4b5563;
 }
 
-.fw-600 {
+.time-display {
+  display: flex;
+  flex-direction: column;
+}
+
+.date-part {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.time-part {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
-.accent-text {
-  color: var(--primary);
-  background-color: rgba(99, 102, 241, 0.1);
-  padding: 4px 8px;
-  border-radius: 4px;
+.status-badge.on-chain {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.status-badge.local-fallback {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px dashed rgba(245, 158, 11, 0.3);
+}
+
+.device-id-cell {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  color: #6b7280;
 }
 
 .empty-state {
+  padding: 80px 0;
   text-align: center;
-  padding: 40px !important;
-  color: var(--text-secondary) !important;
-  font-style: italic;
+}
+
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #9ca3af;
 }
 
 @media (max-width: 768px) {
-  .search-box {
-    width: 100%;
+  .table-header {
+    padding: 16px;
+  }
+  .attendance-table th, .attendance-table td {
+    padding: 12px 16px;
   }
 }

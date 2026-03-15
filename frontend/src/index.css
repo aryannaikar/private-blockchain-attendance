@@ -44,3 +44,31 @@ button {
   font-family: inherit;
   background: none;
 }
+
+/* ── Responsive Utilities ────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    --radius: 10px;
+  }
+  
+  .dashboard-content {
+    padding: 24px 16px !important;
+  }
+}
+
+.mobile-only { display: none; }
+@media (max-width: 768px) {
+  .mobile-only { display: block; }
+  .desktop-only { display: none; }
+}
+
+.flex-column-mobile {
+  display: flex;
+}
+
+@media (max-width: 600px) {
+  .flex-column-mobile {
+    flex-direction: column;
+  }
+}
+

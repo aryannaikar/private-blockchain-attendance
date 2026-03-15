@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { Users, UserCheck, Database, PlayCircle, History, RefreshCw, Network } from 'lucide-react';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import StatsCard from '../../components/StatsCard/StatsCard';
+import ProxyAlerts from '../../components/ProxyAlerts/ProxyAlerts';
+import BunkAlerts from '../../components/BunkAlerts/BunkAlerts';
 import { getAllAttendance, getNetworkStatus, teacherAPI } from '../../services/api';
 import './TeacherDashboard.css';
 
@@ -32,7 +34,7 @@ const TeacherDashboard = () => {
   useEffect(() => { load(); }, [load]);
 
   const unique  = [...new Set(records.map(r => r.studentID))].length;
-  const recent  = [...records].reverse().slice(0, 3);
+  const recent  = [...records].slice(0, 3); // Backend already sorts by timestamp desc
 
   return (
     <div className="dashboard-layout">
@@ -66,6 +68,9 @@ const TeacherDashboard = () => {
           <StatsCard title="Chain ID"         value={loading ? '…' : chainId}          icon={Network}   color="#8B5CF6" />
         </motion.div>
 
+        <ProxyAlerts />
+        <BunkAlerts />
+
         <div className="teacher-grid">
           <section className="quick-actions">
             <h2 className="section-title">Quick Actions</h2>
@@ -82,7 +87,7 @@ const TeacherDashboard = () => {
           </section>
 
           <section className="todays-classes">
-            <h2 className="section-title">Recent Blockchain Entries</h2>
+            <h2 className="section-title">Recent Records</h2>
             <div className="recent-list">
               {recent.length === 0 && !loading && (
                 <p style={{ color: '#9CA3AF', padding: '8px' }}>No records yet.</p>
@@ -92,10 +97,14 @@ const TeacherDashboard = () => {
                   <div className="recent-icon"><Database size={16} /></div>
                   <div className="recent-info">
                     <h4>{r.studentID}</h4>
-                    <span>Block #{r.blockNumber}</span>
+                    <span>{r.sessionID} • Block #{r.blockNumber || 'Local'}</span>
                   </div>
                   <div className="recent-stat">
-                    {r.timestamp ? new Date(r.timestamp * 1000).toLocaleTimeString() : '—'}
+                    {(() => {
+                      let ts = Number(r.timestamp);
+                      if (ts && ts < 100000000000) ts *= 1000;
+                      return ts ? new Date(ts).toLocaleTimeString() : '—';
+                    })()}
                   </div>
                 </div>
               ))}
@@ -108,3 +117,4 @@ const TeacherDashboard = () => {
 };
 
 export default TeacherDashboard;
+
