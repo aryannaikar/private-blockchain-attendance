@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 // ── Node URLs ──────────────────────────────────────────────────────────────
-export const TEACHER_URL = 'http://localhost:4000';
-export const STUDENT_URL = 'http://localhost:3001';
-export const SERVER_URL  = 'http://localhost:5000';
+export const TEACHER_URL = process.env.REACT_APP_TEACHER_URL || 'http://localhost:4000';
+export const STUDENT_URL = process.env.REACT_APP_STUDENT_URL || 'http://localhost:3001';
+export const SERVER_URL  = process.env.REACT_APP_SERVER_URL  || 'http://localhost:5000';
 
 // ── Axios instances ────────────────────────────────────────────────────────
 export const teacherAPI = axios.create({ baseURL: TEACHER_URL, timeout: 10000 });
