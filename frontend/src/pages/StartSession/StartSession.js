@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PlayCircle, Square, Bluetooth, Users, Clock, AlertCircle, Usb, Trash2, Layers } from 'lucide-react';
 import Sidebar from '../../components/Sidebar/Sidebar';
@@ -174,7 +174,7 @@ const StartSession = () => {
         isOpen: false
       });
 
-      const success = await sendSerialCommand("CLOSE");
+      await sendSerialCommand("CLOSE");
       setSessionActive(false);
       setStatusMsg(`Session closed for ${activeSlot}`);
       setMsgType('success');
