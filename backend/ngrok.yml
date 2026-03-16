@@ -6,7 +6,7 @@ tunnels:
   student:
     addr: 3001
     proto: http
-  # servernode:
+  # servernode:npm install -g cloudflared
   #   addr: 5000
   #   proto: http
   # unauthorized:

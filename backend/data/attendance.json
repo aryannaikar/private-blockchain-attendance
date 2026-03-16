@@ -1,97 +1,13 @@
 [
   {
     "studentID": "36",
-    "sessionID": "Class 3",
-    "teacherID": "SUHAS",
-    "teacherName": "suhas",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773595462814,
-    "txHash": "0xb926b33533211e84bda1d8e017bd51b9f01016aab2e9b60e232b7ca2fbcff48a",
+    "sessionID": "Class 1",
+    "teacherID": "LEENA",
+    "teacherName": "Leena Patil",
+    "deviceID": "dca1aedcff8fa5b7cb2432510cd6e861",
+    "timestamp": 1773646626759,
+    "txHash": "0x73b3eaffd0d7f2e80981e42c856afd1903d9c6ad57e97dd3e4dfe7960c9ff7cd",
     "markedBy": "student",
     "status": "confirmed"
-  },
-  {
-    "studentID": "32",
-    "sessionID": "Class 3",
-    "teacherID": "SUHAS",
-    "teacherName": "suhas",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773593765396,
-    "txHash": "0x1cb65cd6e2f01bf6473bb02c6ff117d35e3d96662a9777232c0d388442a31265",
-    "markedBy": "student"
-  },
-  {
-    "studentID": "32",
-    "sessionID": "Class 1",
-    "teacherID": "SUHAS",
-    "teacherName": "suhas",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773593493426,
-    "txHash": "0x0c3abe3f924b2e35644beccf38c3ea85797687c1122269f3381db80282d7163a",
-    "markedBy": "student"
-  },
-  {
-    "studentID": "LEENA",
-    "sessionID": "...",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773591419247,
-    "txHash": "0x46186b8ca7d7220bf074cd5a6b6134115aefd2e42752d9286b9b25c07c352574",
-    "markedBy": "student"
-  },
-  {
-    "studentID": "36",
-    "sessionID": "...",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773591294236,
-    "txHash": "0x7e8217cef921f1c949e9811b156bb2d80696a4c03a8336f950c7097ee2ed5b22",
-    "markedBy": "student"
-  },
-  {
-    "studentID": "32",
-    "sessionID": "...",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773591216479,
-    "txHash": "0xcf1c27379707ab6ed1055c7df85c9539ab988ee3327c00c4ce80684043c74ff9",
-    "markedBy": "student"
-  },
-  {
-    "studentID": "SUHAS",
-    "sessionID": "...",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773589788937,
-    "txHash": "0xcdc1311a0cc594b43b6c4c60332d55129a99abb7c4a1eb4d54bfc7b1032711b0",
-    "markedBy": "student"
-  },
-  {
-    "studentID": "SUHAS",
-    "sessionID": "live",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773589075688,
-    "txHash": "0x9bb2f6cf49c890e16564502b0dbef27fef1b5b729566ab3cab3ef214a37b1251",
-    "markedBy": "student"
-  },
-  {
-    "studentID": "36",
-    "sessionID": "live",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773587539424,
-    "txHash": "0x012efa109631aca9e62438ac379e892d9a28d5e8ff1c305a80aabf51c5a7fc7d",
-    "markedBy": "student"
-  },
-  {
-    "studentID": "32",
-    "sessionID": "live",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773587516195,
-    "txHash": "0xeb181a7a55b2008fe71654f46ae3449df4f00397f00bedbc989ccb564ef55a26",
-    "markedBy": "student"
-  },
-  {
-    "studentID": "ADMIN",
-    "sessionID": "live",
-    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
-    "timestamp": 1773587473743,
-    "txHash": "0x44409c25d10e8a1cf3c7c59942bc3bd62dd9fc0ea97bfcd25b83d4c632913aa2",
-    "markedBy": "student"
   }
 ]

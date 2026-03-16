@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import StatsCard from '../../components/StatsCard/StatsCard';
-import { getAllAttendance, getNetworkStatus, teacherAPI, studentAPI } from '../../services/api';
+import { getAllAttendance, getNetworkStatus, teacherAPI } from '../../services/api';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {

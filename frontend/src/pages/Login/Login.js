@@ -32,7 +32,14 @@ const Login = () => {
       else if (role === 'admin') navigate('/admin');
 
     } catch (err) {
-      const msg = err?.response?.data?.error || 'Login failed. Check credentials.';
+      let msg = 'Login failed.';
+      if (!err.response) {
+        msg = 'Server unreachable. Check your network or PC Firewall.';
+      } else if (err.response.status === 401) {
+        msg = 'Invalid credentials. Please check your Roll No and Password.';
+      } else {
+        msg = err.response.data?.error || 'An unexpected error occurred.';
+      }
       setError(msg);
     } finally {
       setLoading(false);

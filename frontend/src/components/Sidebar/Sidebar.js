@@ -54,10 +54,12 @@ const Sidebar = ({ role }) => {
 
   return (
     <>
-      {/* Mobile Hamburger Button */}
-      <button className="mobile-toggle" onClick={toggleMobile}>
-        {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+      {/* Mobile Hamburger Button - Only show when NOT open or rely on its own state */}
+      {!mobileOpen && (
+        <button className="mobile-toggle" onClick={toggleMobile}>
+          <Menu size={24} />
+        </button>
+      )}
 
       {/* Mobile Overlay */}
       <AnimatePresence>
@@ -75,11 +77,14 @@ const Sidebar = ({ role }) => {
       <motion.aside 
         className={`sidebar ${mobileOpen ? 'open' : ''}`}
         initial={false}
-        animate={{ x: 0 }}
+        animate={{ x: (window.innerWidth <= 768 && !mobileOpen) ? '-100%' : 0 }}
         transition={{ type: 'spring', stiffness: 100, damping: 20 }}
       >
         <div className="sidebar-header">
           <h2 className="sidebar-role">{role?.charAt(0).toUpperCase() + role?.slice(1)} Portal</h2>
+          <button className="mobile-close-btn" onClick={() => setMobileOpen(false)}>
+            <X size={24} />
+          </button>
         </div>
         
         <div className="sidebar-nav">

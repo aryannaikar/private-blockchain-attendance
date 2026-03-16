@@ -68,6 +68,22 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+.mobile-close-btn {
+  display: none;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 6px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.mobile-close-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+}
+
+.desktop-only-hidden { display: none; }
+
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -84,12 +100,12 @@
   .sidebar {
     top: 0;
     height: 100vh;
-    transform: translateX(-100%);
     box-shadow: 10px 0 20px rgba(0, 0, 0, 0.05);
   }
 
+  /* No longer needed as Framer handles 'x' animate */
   .sidebar.open {
-    transform: translateX(0);
+    transform: none;
   }
 
   .mobile-toggle {
@@ -100,6 +116,22 @@
 
   .sidebar-overlay {
     display: block;
+  }
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .mobile-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 50%;
   }
 }
 

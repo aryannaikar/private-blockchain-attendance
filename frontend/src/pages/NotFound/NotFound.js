@@ -1,7 +1,7 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FileQuestion, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import './NotFound.css';
 
 const NotFound = () => {
