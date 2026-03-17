@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, UserPlus, X, RefreshCw, User, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Search, UserPlus, X, RefreshCw, User, ShieldCheck, AlertCircle, Trash2 } from 'lucide-react';
 import Sidebar from '../../components/Sidebar/Sidebar';
-import { createUser, getUsers } from '../../services/api';
+import { createUser, getUsers, deleteUser } from '../../services/api';
 import './ManageUsers.css';
 
 const ManageUsers = () => {
@@ -49,6 +49,24 @@ const ManageUsers = () => {
     } catch (err) {
       setMsgType('error');
       setMsg('❌ ' + (err?.response?.data?.error || 'Failed to create user'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (rollNo) => {
+    if (!window.confirm(`Are you sure you want to delete user ${rollNo}? This action cannot be undone.`)) return;
+    
+    setLoading(true);
+    setMsg('');
+    try {
+      await deleteUser(rollNo);
+      setMsgType('success');
+      setMsg(`✅ User ${rollNo} removed successfully.`);
+      fetchUsers(); // Refresh list
+    } catch (err) {
+      setMsgType('error');
+      setMsg('❌ ' + (err?.response?.data?.error || 'Failed to delete user'));
     } finally {
       setLoading(false);
     }
@@ -194,10 +212,11 @@ const ManageUsers = () => {
             <table className="users-table">
               <thead>
                 <tr>
-                  <th>User</th>
+                   <th>User</th>
                   <th>ID / Roll No</th>
                   <th>Role</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -222,11 +241,34 @@ const ManageUsers = () => {
                           {user.role.toUpperCase()}
                         </span>
                       </td>
-                      <td>
+                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#10B981', fontSize: '13px' }}>
                           <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981' }}></div>
                           Active
                         </div>
+                      </td>
+                      <td>
+                        <button 
+                          className="btn-delete" 
+                          onClick={() => handleDelete(user.rollNo)}
+                          title="Delete User"
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#EF4444',
+                            cursor: 'pointer',
+                            padding: '4px',
+                            borderRadius: '4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseOver={e => e.currentTarget.style.backgroundColor = '#FEE2E2'}
+                          onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </td>
                     </tr>
                   ))

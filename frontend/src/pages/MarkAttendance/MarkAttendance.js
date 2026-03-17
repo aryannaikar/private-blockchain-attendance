@@ -23,19 +23,22 @@ const MarkAttendance = () => {
         const { getActiveSession, getMyAttendance } = await import('../../services/api');
         const res = await getActiveSession();
         const slot = res.data.activeSlot;
-        setSessionID(slot);
+        setSessionID(slot || 'Class Session');
         setTeacherName(res.data.teacherName || 'Teacher');
-        setSessionOpen(true);
+        setSessionOpen(res.data.isOpen || false);
 
         // Check if already marked for this session
-        const historyRes = await getMyAttendance(rollNo);
-        const alreadyPresent = historyRes.data.find(r => r.sessionID === slot);
-        if (alreadyPresent) {
-          setScanState('success');
-          setTxHash(alreadyPresent.txHash || 'ALREADY_RECORDED');
+        if (rollNo) {
+          const historyRes = await getMyAttendance(rollNo);
+          const alreadyPresent = historyRes.data.find(r => r.sessionID === slot);
+          if (alreadyPresent) {
+            setScanState('success');
+            setTxHash(alreadyPresent.txHash || 'ALREADY_RECORDED');
+          }
         }
       } catch (err) {
         console.error("Failed to fetch session:", err);
+        setErrorMsg("Cannot connect to Teacher Node. Ensure you are on the same Wi-Fi.");
         setSessionOpen(false);
       }
     };
@@ -46,31 +49,44 @@ const MarkAttendance = () => {
     setScanState('scanning');
     setErrorMsg('');
 
+    // Check for Secure Context (required for Web Bluetooth)
+    const isSecureContext = window.isSecureContext;
+
     try {
-      // 1. Check if Web Bluetooth API is available (only supported in Chrome/Edge, requires HTTPS or localhost)
-      if (navigator.bluetooth) {
+      // 1. Check if Web Bluetooth API is available and in Secure Context
+      if (navigator.bluetooth && isSecureContext) {
         
         // This will pop up a browser dialog asking the user to pair/select "Teacher_Attendance"
-        // It acts as our 'scan' to prove the ESP32 is nearby in advertising mode
         await navigator.bluetooth.requestDevice({
           filters: [{ name: 'Teacher_Attendance' }],
-          // acceptAllDevices: false
         });
         
-        // If we reach here, they successfully found and selected it in the browser UI!
         setScanState('found');
 
       } else {
-        // Fallback for Firefox/Safari etc: we just skip to Node Verification
-        console.warn('Web Bluetooth API not supported on this browser. Proceeding to Node verification...');
-        setScanState('found');
+        // Handle insecure context or lack of API support
+        if (!isSecureContext) {
+          setErrorMsg('Bluetooth Pairing Unavailable (Insecure Connection). Please use the HTTPS link provided by your teacher to enable proximity verification.');
+          setScanState('error');
+          return;
+        } else {
+          console.warn('Web Bluetooth API not supported. Proceeding to Node verification...');
+          // On desktop non-bluetooth browsers, we still allow proceeding
+          await new Promise(resolve => setTimeout(resolve, 800));
+          setScanState('found');
+        }
       }
 
     } catch (err) {
-      // User cancelled the prompt, or no device found
+      if (err.name === 'NotFoundError') {
+        setErrorMsg('Could not find "Teacher_Attendance". Ensure the teacher has started the session and you are nearby.');
+      } else if (err.name === 'SecurityError') {
+        setErrorMsg('Bluetooth access was blocked. Ensure you are using an HTTPS connection.');
+      } else {
+        setErrorMsg('Bluetooth scan cancelled or failed.');
+      }
       setScanState('error');
-      setErrorMsg('Could not find Teacher_Attendance Bluetooth device. Make sure you are in the classroom.');
-      return; // Stop here, do not mark
+      return;
     }
 
     // 2. Small delay, then push the blockchain transaction
@@ -78,14 +94,13 @@ const MarkAttendance = () => {
       setScanState('verifying');
 
       try {
-        // Grab device fingerprint silently
         const deviceID = await getDeviceId();
-
         const res = await markAttendanceStudent(rollNo, deviceID, sessionID);
         setTxHash(res.data.txHash || '');
         setScanState('success');
       } catch (err) {
-        const msg = err?.response?.data?.error || 'Failed to record attendance. Try again.';
+        console.error("Mark Attendance Error:", err);
+        const msg = err?.response?.data?.error || err.message || 'Failed to record attendance.';
         setErrorMsg(msg);
         setScanState('error');
       }

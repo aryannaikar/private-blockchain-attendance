@@ -2,8 +2,9 @@ import axios from 'axios';
 
 // ── Node URLs ──────────────────────────────────────────────────────────────
 // Helper to determine base URL (localhost for dev, IP or hostname for others)
+// Helper to determine base URL (localhost for dev, IP or hostname for others)
 const getBaseURL = (port) => {
-  const hostname = window.location.hostname;
+  const hostname = window.location.hostname; // 'localhost' or IP like '192.168.1.5'
   return `http://${hostname}:${port}`;
 };
 
@@ -12,9 +13,10 @@ export const STUDENT_URL = process.env.REACT_APP_STUDENT_URL || getBaseURL(3001)
 export const SERVER_URL  = process.env.REACT_APP_SERVER_URL  || getBaseURL(5000);
 
 // ── Axios instances ────────────────────────────────────────────────────────
-export const teacherAPI = axios.create({ baseURL: TEACHER_URL, timeout: 10000 });
-export const studentAPI = axios.create({ baseURL: STUDENT_URL, timeout: 10000 });
-export const serverAPI  = axios.create({ baseURL: SERVER_URL,  timeout: 10000 });
+// Increased timeout for potentially slower mobile network
+export const teacherAPI = axios.create({ baseURL: TEACHER_URL, timeout: 15000 });
+export const studentAPI = axios.create({ baseURL: STUDENT_URL, timeout: 15000 });
+export const serverAPI  = axios.create({ baseURL: SERVER_URL,  timeout: 15000 });
 
 const API = {
   teacher: teacherAPI,
@@ -56,6 +58,10 @@ export const createUser = (data) =>
 // Get all users (admin) → Server Node (port 5000)
 export const getUsers = () =>
   serverAPI.get('/admin/users');
+
+// Delete user (admin) → Server Node (port 5000)
+export const deleteUser = (rollNo) =>
+  serverAPI.delete(`/admin/delete-user/${rollNo}`);
 
 // ── Session Management ─────────────────────────────────────────────────────
 // Get active session (teacher) → Teacher Node (port 4000)
