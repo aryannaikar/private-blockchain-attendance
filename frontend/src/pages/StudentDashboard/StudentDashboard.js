@@ -60,6 +60,7 @@ const StudentDashboard = () => {
         {/* Header */}
         <header className="dashboard-header">
           <div className="header-left">
+            <span className="section-label" style={{ display: 'block', marginBottom: '6px', color: 'var(--primary)' }}>WELCOME, {name}</span>
             <h1 className="dashboard-title">STUDENT PORTAL</h1>
             <p className="subtitle">Track your blockchain-verified attendance</p>
           </div>

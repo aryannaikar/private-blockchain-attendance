@@ -273,16 +273,6 @@ router.get("/proxy-alerts", async (req, res) => {
       records = JSON.parse(fs.readFileSync(attendancePath));
     }
 
-    let dismissed = [];
-    try {
-      if (fs.existsSync(dismissedPath)) {
-        dismissed = JSON.parse(fs.readFileSync(dismissedPath));
-      }
-    } catch (e) {
-      console.error("Failed to read dismissed.json:", e);
-    }
-    const dismissedKeys = new Set(dismissed.map(d => `${d.deviceID}||${d.sessionID}`));
-
     const groups = {};
     for (const r of records) {
       const device  = r.deviceID  || "unknown";
@@ -290,20 +280,23 @@ router.get("/proxy-alerts", async (req, res) => {
       if (device === "unknown") continue;
 
       const key = `${device}||${session}`;
-      if (dismissedKeys.has(key)) continue;
 
       if (!groups[key]) {
-        groups[key] = { deviceID: device, sessionID: session, students: new Set() };
+        groups[key] = { deviceID: device, sessionID: session, count: 0, students: [] };
       }
-      groups[key].students.add(r.studentID);
+      
+      groups[key].count++;
+      if (!groups[key].students.includes(r.studentID)) {
+        groups[key].students.push(r.studentID);
+      }
     }
 
     const alerts = Object.values(groups)
-      .filter(g => g.students.size > 1)
+      .filter(g => g.count > 1)
       .map(g => ({
         deviceID:  g.deviceID,
         sessionID: g.sessionID,
-        students:  [...g.students]
+        students:  g.students
       }));
 
     res.json(alerts);

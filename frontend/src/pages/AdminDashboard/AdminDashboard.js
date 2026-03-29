@@ -63,15 +63,15 @@ const AdminDashboard = () => {
         </header>
 
         <motion.div
-          className="stats-grid"
+          className="admin-stats-grid"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <StatsCard title="Unique Students"  value={loading ? '…' : uniqueStudents}  icon={GraduationCap} color="#6366F1" />
-          <StatsCard title="Total Records"    value={loading ? '…' : records.length}  icon={Activity}      color="#22C55E" />
-          <StatsCard title="Chain ID"         value={loading ? '…' : chainId}          icon={Database}      color="#F59E0B" />
-          <StatsCard title="Latest Block"     value={loading ? '…' : `#${blockNumber}`} icon={Database}    color="#8B5CF6" />
+          <StatsCard title="Unique Students"  value={loading ? '…' : uniqueStudents}  icon={GraduationCap} color="#00D2FF" />
+          <StatsCard title="Total Records"    value={loading ? '…' : records.length}  icon={Activity}      color="#00F260" />
+          <StatsCard title="Chain ID"         value={loading ? '…' : chainId}         icon={Database}      color="#FBBF24" />
+          <StatsCard title="Latest Block"     value={loading ? '…' : `#${blockNumber}`} icon={Database}    color="#FF4E50" />
         </motion.div>
 
         <div className="charts-grid">
@@ -82,15 +82,18 @@ const AdminDashboard = () => {
                 <AreaChart data={weeklyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorRec" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="#6366F1" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0}   />
+                      <stop offset="5%"  stopColor="#00D2FF" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#00D2FF" stopOpacity={0}   />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="name"    axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} dy={10} />
-                  <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} dx={-10} />
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <Tooltip wrapperStyle={{ borderRadius: '8px' }} />
-                  <Area type="monotone" dataKey="records" stroke="#6366F1" strokeWidth={3} fillOpacity={1} fill="url(#colorRec)" />
+                  <XAxis dataKey="name"    axisLine={false} tickLine={false} tick={{ fill: '#64748B' }} dy={10} />
+                  <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: '#64748B' }} dx={-10} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#0A0D14', borderColor: 'rgba(255,255,255,0.08)', borderRadius: '12px' }}
+                    itemStyle={{ color: '#00D2FF' }}
+                  />
+                  <Area type="monotone" dataKey="records" stroke="#00D2FF" strokeWidth={3} fillOpacity={1} fill="url(#colorRec)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -104,11 +107,15 @@ const AdminDashboard = () => {
                   data={[{ name: 'Current Block', blocks: blockNumber }]}
                   margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} dx={-10} />
-                  <Tooltip cursor={{ fill: 'rgba(34, 197, 94, 0.05)' }} />
-                  <Bar dataKey="blocks" fill="#22C55E" radius={[4, 4, 0, 0]} barSize={80} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748B' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748B' }} dx={-10} />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(0, 242, 96, 0.05)' }}
+                    contentStyle={{ backgroundColor: '#0A0D14', borderColor: 'rgba(255,255,255,0.08)', borderRadius: '12px' }}
+                    itemStyle={{ color: '#00F260' }}
+                  />
+                  <Bar dataKey="blocks" fill="#00F260" radius={[4, 4, 0, 0]} barSize={80} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

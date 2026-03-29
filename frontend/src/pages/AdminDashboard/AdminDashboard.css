@@ -42,6 +42,22 @@
   border-color: rgba(255, 255, 255, 0.14);
 }
 
+/* ── Stats grid ────────────────────────────────── */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1200px) {
+  .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .admin-stats-grid { grid-template-columns: 1fr; }
+}
+
 /* ── Charts grid ───────────────────────────────── */
 .charts-grid {
   display: grid;
@@ -56,6 +72,8 @@
   border-radius: var(--radius);
   border: 1px solid var(--glass-border);
   padding: 24px;
+  display: flex;
+  flex-direction: column;
 }
 
 .chart-card h3 {
@@ -68,7 +86,8 @@
 }
 
 .chart-wrapper {
-  height: 280px;
+  flex: 1;
+  min-height: 280px;
   width: 100%;
 }
 

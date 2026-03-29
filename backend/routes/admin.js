@@ -87,4 +87,39 @@ router.get("/users", async (req, res) => {
   }
 });
 
+// DELETE USER (Admin)
+router.delete("/delete-user/:rollNo", async (req, res) => {
+  try {
+    const { rollNo } = req.params;
+    let deleted = false;
+
+    if (db) {
+      const userRef = db.collection("users").doc(rollNo);
+      const doc = await userRef.get();
+      if (doc.exists) {
+        await userRef.delete();
+        deleted = true;
+      }
+    } else {
+      let localUsers = JSON.parse(fs.readFileSync(usersPath));
+      const initialLength = localUsers.length;
+      localUsers = localUsers.filter(u => u.rollNo !== rollNo);
+      
+      if (localUsers.length < initialLength) {
+        fs.writeFileSync(usersPath, JSON.stringify(localUsers, null, 2));
+        deleted = true;
+      }
+    }
+
+    if (deleted) {
+      res.json({ message: `User ${rollNo} deleted successfully` });
+    } else {
+      res.status(404).json({ error: `User ${rollNo} not found` });
+    }
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
 module.exports = router;

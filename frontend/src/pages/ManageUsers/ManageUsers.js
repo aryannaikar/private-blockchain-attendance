@@ -126,27 +126,29 @@ const ManageUsers = () => {
         {showForm && (
           <div className="modal-overlay" onClick={() => setShowForm(false)}>
             <div className="modal-card" onClick={e => e.stopPropagation()}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', color: '#fff' }}>
                 <h2>Register New User</h2>
-                <button style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => setShowForm(false)}>
+                <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff' }} onClick={() => setShowForm(false)}>
                   <X size={20} />
                 </button>
               </div>
               <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#fff', fontSize: '0.9rem' }}>
                     <input
                       type="radio" name="role" value="student"
                       checked={form.role === 'student'}
                       onChange={e => setForm({ ...form, role: e.target.value })}
+                      style={{ accentColor: 'var(--primary)', width: '16px', height: '16px' }}
                     />
                     Student
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#fff', fontSize: '0.9rem' }}>
                     <input
                       type="radio" name="role" value="teacher"
                       checked={form.role === 'teacher'}
                       onChange={e => setForm({ ...form, role: e.target.value })}
+                      style={{ accentColor: 'var(--primary)', width: '16px', height: '16px' }}
                     />
                     Teacher
                   </label>
@@ -177,23 +179,23 @@ const ManageUsers = () => {
 
         <div className="users-card">
           <div className="users-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '20px' }}>
-            <div style={{ display: 'flex', gap: '8px', background: '#F3F4F6', padding: '4px', borderRadius: '10px' }}>
+            <div style={{ display: 'flex', gap: '8px', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', padding: '6px', borderRadius: '12px', backdropFilter: 'blur(8px)' }}>
               {['all', 'student', 'teacher'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   style={{
-                    padding: '8px 16px',
+                    padding: '8px 20px',
                     borderRadius: '8px',
                     fontSize: '14px',
-                    fontWeight: '600',
+                    fontWeight: '700',
                     transition: 'all 0.2s',
-                    backgroundColor: activeTab === tab ? '#FFFFFF' : 'transparent',
-                    color: activeTab === tab ? '#111827' : '#6B7280',
-                    boxShadow: activeTab === tab ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                    backgroundColor: activeTab === tab ? 'var(--primary)' : 'transparent',
+                    color: activeTab === tab ? '#000' : 'var(--text-secondary)',
+                    boxShadow: activeTab === tab ? '0 0 15px var(--primary-glow)' : 'none'
                   }}
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}s
+                  {tab === 'all' ? 'All' : tab.charAt(0).toUpperCase() + tab.slice(1) + 's'}
                 </button>
               ))}
             </div>
@@ -242,8 +244,8 @@ const ManageUsers = () => {
                         </span>
                       </td>
                        <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#10B981', fontSize: '13px' }}>
-                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981' }}></div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-green)', fontSize: '13px', fontWeight: 600 }}>
+                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-green)', boxShadow: '0 0 8px var(--accent-green-glow)' }}></div>
                           Active
                         </div>
                       </td>
@@ -253,19 +255,19 @@ const ManageUsers = () => {
                           onClick={() => handleDelete(user.rollNo)}
                           title="Delete User"
                           style={{
-                            background: 'none',
-                            border: 'none',
-                            color: '#EF4444',
+                            background: 'rgba(255, 78, 80, 0.1)',
+                            border: '1px solid rgba(255, 78, 80, 0.2)',
+                            color: 'var(--danger)',
                             cursor: 'pointer',
-                            padding: '4px',
-                            borderRadius: '4px',
+                            padding: '6px',
+                            borderRadius: '6px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            transition: 'background 0.2s'
+                            transition: 'all 0.2s'
                           }}
-                          onMouseOver={e => e.currentTarget.style.backgroundColor = '#FEE2E2'}
-                          onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                          onMouseOver={e => { e.currentTarget.style.backgroundColor = 'var(--danger)'; e.currentTarget.style.color = '#fff'; }}
+                          onMouseOut={e => { e.currentTarget.style.backgroundColor = 'rgba(255, 78, 80, 0.1)'; e.currentTarget.style.color = 'var(--danger)'; }}
                         >
                           <Trash2 size={18} />
                         </button>

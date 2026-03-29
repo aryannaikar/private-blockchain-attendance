@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar/Navbar';
+import FrameScrollAnimation from '../../components/FrameScrollAnimation/FrameScrollAnimation';
 import { Shield, Fingerprint, Database, Cpu, Network, Lock, Server, Link as LinkIcon, Code } from 'lucide-react';
 import './Landing.css';
 
@@ -24,35 +25,39 @@ const technologies = [
 ];
 
 const Landing = () => {
+  const heroRef = useRef(null);
+
   return (
     <div className="landing-page">
       <Navbar />
 
-      <section className="hero-section">
-        <motion.div 
-          className="hero-content"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="badge">Next Generation Attendance</div>
-          <h1 className="hero-title">
-            <span>Blockchain + IoT</span><br/>
-            Smart Attendance
-          </h1>
-          <p className="hero-subtitle">
-            Secure, immutable, and automated attendance tracking system leveraging Ethereum smart contracts and ESP32 hardware verification.
-          </p>
-          <div className="hero-buttons">
-            <Link to="/login" className="btn-primary-large">Get Started <Shield size={18}/></Link>
-            <Link to="/login" className="btn-secondary-large">View Dashboard</Link>
+      <section ref={heroRef} className="hero-scroll-wrapper">
+        <div className="hero-sticky-content">
+          {/* Background Frame Scroll Animation */}
+          <FrameScrollAnimation scrollTarget={heroRef} />
+
+          <div className="hero-content">
+            <div className="badge">
+              Next Generation Attendance
+            </div>
+            <h1 className="hero-title">
+              <span>Blockchain + IoT</span><br/>
+              Smart Attendance
+            </h1>
+            <p className="hero-subtitle">
+              Secure, immutable, and automated attendance tracking system leveraging Ethereum smart contracts and ESP32 hardware verification.
+            </p>
+            <div className="hero-buttons">
+              <Link to="/login" className="btn-primary-large">Get Started <Shield size={18}/></Link>
+              <Link to="/login" className="btn-secondary-large">View Dashboard</Link>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       <section id="features" className="features-section">
         <div className="section-container">
-          <div className="section-header">
+          <div className="landing-section-header">
             <h2>Key Features</h2>
             <p>Everything you need for bulletproof attendance tracking</p>
           </div>
@@ -61,11 +66,11 @@ const Landing = () => {
               <motion.div 
                 key={i} 
                 className="feature-card"
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -5 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                whileHover={{ y: -5, borderColor: 'var(--primary)' }}
               >
                 <div className="feature-icon"><feature.icon size={24} /></div>
                 <h3>{feature.title}</h3>
@@ -78,7 +83,7 @@ const Landing = () => {
 
       <section id="technology" className="technology-section">
         <div className="section-container">
-          <div className="section-header">
+          <div className="landing-section-header">
             <h2>Powered By</h2>
             <p>Built with enterprise-ready technologies</p>
           </div>
@@ -87,8 +92,8 @@ const Landing = () => {
               <motion.div 
                 key={i} 
                 className="tech-badge"
-                style={{ backgroundColor: tech.bg, color: tech.color || '#fff' }}
-                whileHover={{ scale: 1.05 }}
+                style={{ border: `1px solid ${tech.bg}44`, color: '#fff' }}
+                whileHover={{ scale: 1.05, backgroundColor: `${tech.bg}11`, borderColor: tech.bg }}
               >
                 {tech.name}
               </motion.div>
@@ -99,12 +104,12 @@ const Landing = () => {
 
       <section id="architecture" className="architecture-section">
         <div className="section-container">
-          <div className="section-header">
+          <div className="landing-section-header">
             <h2>Architecture</h2>
             <p>How the system works silently in the background</p>
           </div>
           
-          <div className="architecture-diagram">
+          <div className="architecture-diagram glass-card">
             <div className="arch-node">
               <div className="arch-circle student-node"><Fingerprint className="arch-icon" /></div>
               <span>Student Device</span>
@@ -129,7 +134,13 @@ const Landing = () => {
       </section>
       
       <footer className="landing-footer">
-        <p>© 2026 BlockAttend. All rights reserved.</p>
+        <div className="footer-content">
+          <div className="footer-logo">
+            <Shield size={24} color="var(--primary)" />
+            <span>BlockAttend</span>
+          </div>
+          <p>© 2026 Private Blockchain Attendance System. All rights reserved.</p>
+        </div>
       </footer>
     </div>
   );
