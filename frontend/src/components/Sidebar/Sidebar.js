@@ -10,7 +10,8 @@ import {
   Users, 
   History,
   Menu,
-  X
+  X,
+  GraduationCap
 } from 'lucide-react';
 import NavLink from '../NavLink/NavLink';
 import './Sidebar.css';
@@ -28,43 +29,41 @@ const Sidebar = ({ role }) => {
   const getLinks = () => {
     if (role === 'student') {
       return [
-        { to: '/student', icon: LayoutDashboard, label: 'Dashboard' },
-        { to: '/student/mark', icon: CheckSquare, label: 'Mark Attendance' },
-        { to: '/student/history', icon: Clock, label: 'My Attendance' },
+        { to: '/student',         icon: LayoutDashboard, label: 'Dashboard' },
+        { to: '/student/mark',    icon: CheckSquare,     label: 'Mark Attendance' },
+        { to: '/student/history', icon: Clock,           label: 'My Attendance' },
       ];
     }
     if (role === 'teacher') {
       return [
-        { to: '/teacher', icon: LayoutDashboard, label: 'Dashboard' },
-        { to: '/teacher/session', icon: PlayCircle, label: 'Start Session' },
-        { to: '/teacher/history', icon: History, label: 'View Attendance' },
+        { to: '/teacher',         icon: LayoutDashboard, label: 'Dashboard' },
+        { to: '/teacher/session', icon: PlayCircle,      label: 'Start Session' },
+        { to: '/teacher/history', icon: History,         label: 'View Attendance' },
       ];
     }
     if (role === 'admin') {
       return [
-        { to: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
-        { to: '/admin/users', icon: Users, label: 'Manage Users' },
-        { to: '/admin/history', icon: History, label: 'All Attendance' },
+        { to: '/admin',           icon: LayoutDashboard, label: 'Dashboard' },
+        { to: '/admin/users',     icon: Users,           label: 'Manage Users' },
+        { to: '/admin/history',   icon: History,         label: 'All Attendance' },
       ];
     }
     return [];
   };
 
-  const toggleMobile = () => setMobileOpen(!mobileOpen);
-
   return (
     <>
-      {/* Mobile Hamburger Button - Only show when NOT open or rely on its own state */}
+      {/* Mobile hamburger */}
       {!mobileOpen && (
-        <button className="mobile-toggle" onClick={toggleMobile}>
-          <Menu size={24} />
+        <button className="mobile-toggle" onClick={() => setMobileOpen(true)}>
+          <Menu size={22} color="#FFF" />
         </button>
       )}
 
-      {/* Mobile Overlay */}
+      {/* Mobile overlay */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div 
+          <motion.div
             className="sidebar-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -74,20 +73,24 @@ const Sidebar = ({ role }) => {
         )}
       </AnimatePresence>
 
-      <motion.aside 
-        className={`sidebar ${mobileOpen ? 'open' : ''}`}
-        initial={false}
-        animate={{ x: (window.innerWidth <= 768 && !mobileOpen) ? '-100%' : 0 }}
-        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-      >
+      {/* Sidebar */}
+      <aside className={`sidebar ${mobileOpen ? 'open' : ''}`}>
+        {/* Header */}
         <div className="sidebar-header">
-          <h2 className="sidebar-role">{role?.charAt(0).toUpperCase() + role?.slice(1)} Portal</h2>
+          <div className="brand">
+            <div className="brand-icon">
+              <GraduationCap size={20} color="#00D2FF" />
+            </div>
+            <h2 className="sidebar-role">{role?.toUpperCase()}</h2>
+          </div>
           <button className="mobile-close-btn" onClick={() => setMobileOpen(false)}>
-            <X size={24} />
+            <X size={22} color="#94A3B8" />
           </button>
         </div>
-        
-        <div className="sidebar-nav">
+
+        {/* Nav */}
+        <nav className="sidebar-nav">
+          <p className="nav-label">MAIN MENU</p>
           {getLinks().map((link) => (
             <div key={link.to} onClick={() => setMobileOpen(false)}>
               <NavLink to={link.to} icon={link.icon}>
@@ -95,15 +98,16 @@ const Sidebar = ({ role }) => {
               </NavLink>
             </div>
           ))}
-        </div>
+        </nav>
 
+        {/* Footer */}
         <div className="sidebar-footer">
           <button className="logout-btn" onClick={handleLogout}>
-            <LogOut size={20} />
+            <LogOut size={18} />
             <span>Logout</span>
           </button>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 };

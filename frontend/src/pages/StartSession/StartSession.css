@@ -1,180 +1,262 @@
-.session-content {
+/* ── TEACHER DASHBOARD CSS ── */
+
+/* Control Main Panel */
+.control-main {
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.session-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.session-status-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.live-clock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── Big Toggle Button ─────────────────────────── */
+.big-toggle-btn {
+  width: 210px;
+  height: 72px;
+  border-radius: 36px;
+  border: 2px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.03);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  gap: 14px;
+  cursor: pointer;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  transition: all 0.35s ease;
+  position: relative;
 }
 
-.session-card {
-  background: var(--card);
-  border-radius: 24px;
-  border: 1px solid var(--border);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-  width: 100%;
-  max-width: 550px;
-  overflow: hidden;
+.big-toggle-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
-.session-header {
-  padding: 32px;
-  border-bottom: 1px solid var(--border);
-  background: linear-gradient(to right, rgba(99, 102, 241, 0.05), rgba(34, 197, 94, 0.05));
+.big-toggle-btn.active {
+  background: rgba(0, 242, 96, 0.1);
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+  box-shadow: 0 0 35px var(--accent-green-glow);
+}
+
+.big-toggle-btn .glow-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: all 0.35s ease;
+  flex-shrink: 0;
+}
+
+.big-toggle-btn.active .glow-dot {
+  background: var(--accent-green);
+  box-shadow: 0 0 14px var(--accent-green);
+  animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.6); opacity: 0.5; }
+}
+
+/* ── Session Meta ──────────────────────────────── */
+.session-meta {
+  display: flex;
+  gap: 48px;
+}
+
+.meta-item {
   text-align: center;
 }
 
-.session-header h2 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: 8px;
+.meta-item .label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
 }
 
-.session-header p {
-  color: var(--text-secondary);
-}
-
-.session-body {
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.instructions-box {
-  background: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
-  width: 100%;
-  margin-bottom: 40px;
-}
-
-.instructions-box h3 {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--primary);
-  font-size: 1.1rem;
-  margin-bottom: 16px;
-}
-
-.instructions-list {
-  padding-left: 20px;
-  color: var(--text-primary);
-  line-height: 1.8;
-}
-
-.instructions-list li {
-  margin-bottom: 8px;
-}
-
-.instructions-list strong {
-  font-family: 'JetBrains Mono', monospace;
-  background: rgba(99, 102, 241, 0.1);
-  color: var(--primary);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.timer-circle {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  border: 4px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 32px;
-  transition: all 0.3s ease;
-}
-
-.timer-circle.active {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-.time-display {
-  font-size: 3.5rem;
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-  line-height: 1;
-  color: var(--text-primary);
-}
-
-.timer-circle.active .time-display {
-  color: var(--accent);
-}
-
-.time-label {
-  font-size: 0.9rem;
+.meta-item .value {
+  font-size: 1.05rem;
   font-weight: 600;
+}
+
+/* ── Config Sidebar ────────────────────────────── */
+.config-card {
+  padding: 24px;
+  height: 100%;
+}
+
+.config-card h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 20px;
   color: var(--text-secondary);
-  margin-top: 8px;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-.live-stats {
+.config-list { display: flex; flex-direction: column; gap: 12px; }
+
+.hw-status-row {
   display: flex;
-  gap: 16px;
-  margin-bottom: 32px;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
 }
 
-.stat-pill {
+.hw-info {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: var(--background);
-  padding: 8px 16px;
-  border-radius: 50px;
-  border: 1px solid var(--border);
-  font-size: 0.95rem;
+  gap: 10px;
+  font-size: 0.85rem;
 }
 
-.stat-pill strong {
-  color: var(--primary);
-}
-
-.btn-session {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-  padding: 18px;
-  border-radius: 16px;
-  font-size: 1.1rem;
+.btn-connect, .btn-connected {
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: white;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-connect {
+  background: var(--primary);
+  color: #000;
+}
+
+.btn-connect:hover { opacity: 0.85; }
+
+.btn-connected {
+  background: rgba(0, 242, 96, 0.1);
+  color: var(--accent-green);
+  border: 1px solid rgba(0, 242, 96, 0.25);
+}
+
+/* ── Slot Grid ─────────────────────────────────── */
+.slot-selector { margin-top: 20px; }
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.slot-btn {
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s;
 }
 
-.btn-start {
+.slot-btn:hover:not(:disabled) {
+  background: rgba(0, 210, 255, 0.06);
+  color: var(--primary);
+  border-color: rgba(0, 210, 255, 0.3);
+}
+
+.slot-btn.active {
   background: var(--primary);
-  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+  color: #000;
+  border-color: var(--primary);
 }
 
-.btn-start:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 25px -5px rgba(99, 102, 241, 0.4);
+.slot-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Manual Entry ──────────────────────────────── */
+.manual-entry-card { padding: 32px; }
+
+.manual-entry-card h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
 }
 
-.btn-end {
-  background: var(--danger);
-  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+.input-group {
+  display: flex;
+  gap: 16px;
 }
 
-.btn-end:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 25px -5px rgba(239, 68, 68, 0.4);
+.input-group input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 14px 20px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-family: inherit;
+  transition: all 0.25s;
 }
 
-@media (max-width: 600px) {
-  .session-card {
-    border-radius: 16px;
-  }
-  .session-body {
-    padding: 24px;
-  }
+.input-group input::placeholder { color: var(--text-muted); }
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: rgba(0, 210, 255, 0.04);
+  box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.08);
 }
+
+.status-msg {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.status-msg.success {
+  background: rgba(0, 242, 96, 0.08);
+  color: var(--accent-green);
+  border: 1px solid rgba(0, 242, 96, 0.15);
+}
+
+.status-msg.error {
+  background: rgba(255, 78, 80, 0.08);
+  color: var(--danger);
+  border: 1px solid rgba(255, 78, 80, 0.15);
+}
+
+/* ── Header actions ────────────────────────────── */
+.header-left {}
+.header-right {}

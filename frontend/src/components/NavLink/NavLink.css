@@ -1,31 +1,50 @@
+/* NavLink — dark theme overrides */
 .sidebar-link {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
+  gap: 14px;
+  padding: 11px 20px;
   color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
+  font-size: 0.88rem;
   border-left: 3px solid transparent;
   transition: all 0.2s ease;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .sidebar-link:hover {
-  background-color: rgba(99, 102, 241, 0.05);
+  background: rgba(0, 210, 255, 0.06);
   color: var(--primary);
+  border-left-color: rgba(0, 210, 255, 0.4);
 }
 
 .sidebar-link.active {
-  background-color: rgba(99, 102, 241, 0.1);
+  background: rgba(0, 210, 255, 0.1);
   color: var(--primary);
   border-left-color: var(--primary);
 }
 
 .link-icon {
   color: inherit;
+  flex-shrink: 0;
 }
 
+/* Keep icon centred when sidebar is collapsed; hide text */
 .link-text {
-  font-size: 0.95rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+/* Reveal text only when sidebar expands (desktop hover) */
+@media (min-width: 769px) {
+  .sidebar:hover .link-text { opacity: 1; }
+}
+
+/* On mobile the sidebar is always fully open, so always show text */
+@media (max-width: 768px) {
+  .link-text { opacity: 1; }
 }

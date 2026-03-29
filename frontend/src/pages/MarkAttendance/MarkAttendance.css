@@ -1,29 +1,43 @@
+/* ═══════════════════════════════════════════════ */
+/*  MarkAttendance — dark glass theme              */
+/* ═══════════════════════════════════════════════ */
+
+/* Center the card vertically */
 .attendance-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 40px 20px;
+  min-height: calc(100vh - 80px);
 }
 
+/* Main scanner card */
 .attendance-scanner-card {
-  background: var(--card);
-  border-radius: 24px;
-  border: 1px solid var(--border);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 28px;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   width: 100%;
-  max-width: 500px;
+  max-width: 480px;
   overflow: hidden;
   text-align: center;
 }
 
+/* Header */
 .scanner-header {
-  padding: 32px;
-  border-bottom: 1px solid var(--border);
-  background: linear-gradient(to right, rgba(99, 102, 241, 0.05), rgba(34, 197, 94, 0.05));
+  padding: 32px 32px 28px;
+  border-bottom: 1px solid var(--glass-border);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 210, 255, 0.06),
+    rgba(0, 242, 96, 0.04)
+  );
 }
 
 .scanner-header h2 {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: var(--text-primary);
   margin-bottom: 8px;
@@ -31,12 +45,14 @@
 
 .scanner-header p {
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
+/* Body */
 .scanner-body {
   padding: 48px 32px;
-  min-height: 350px;
+  min-height: 320px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -46,74 +62,116 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 4px;
 }
 
 .state-content h3 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  margin-bottom: 8px;
-  margin-top: 24px;
+  margin: 20px 0 8px;
+  color: var(--text-primary);
 }
 
-.state-content p {
-  color: var(--text-secondary);
+.state-content p { color: var(--text-secondary); font-size: 0.9rem; }
+
+/* Session tags */
+.session-tags {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 12px;
 }
 
-.pulse-button-wrapper {
-  position: relative;
+.session-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
 }
+
+.session-tag.slot {
+  background: rgba(0, 210, 255, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(0, 210, 255, 0.2);
+}
+
+.session-tag.teacher {
+  background: rgba(0, 242, 96, 0.1);
+  color: var(--accent-green);
+  border: 1px solid rgba(0, 242, 96, 0.2);
+}
+
+/* Error msg below tags */
+.session-error {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--danger);
+}
+
+/* ── Scan button ───────────────────────────────── */
+.pulse-button-wrapper { position: relative; }
 
 .scan-btn {
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: var(--primary);
-  color: white;
+  background: linear-gradient(135deg, #00D2FF, #0099bb);
+  color: #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
-  animation: pulse 2s infinite;
+  box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.5);
+  animation: scanPulse 2s ease infinite;
+  cursor: pointer;
+  border: none;
   transition: transform 0.2s;
 }
 
-.scan-btn:hover {
-  transform: scale(1.05);
+.scan-btn:hover { transform: scale(1.06); }
+
+@keyframes scanPulse {
+  0%   { box-shadow: 0 0 0 0   rgba(0, 210, 255, 0.5); }
+  70%  { box-shadow: 0 0 0 22px rgba(0, 210, 255, 0); }
+  100% { box-shadow: 0 0 0 0   rgba(0, 210, 255, 0); }
 }
 
-@keyframes pulse {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(99, 102, 241, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
-}
-
+/* ── Scanning spinner ─────────────────────────── */
 .scanning-icon {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(0, 210, 255, 0.1);
+  border: 1px solid rgba(0, 210, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* ── Network found ─────────────────────────────── */
 .network-found-box {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(34, 197, 94, 0.1);
-  padding: 16px 24px;
-  border-radius: 12px;
-  border: 1px solid rgba(34, 197, 94, 0.2);
+  background: rgba(0, 242, 96, 0.08);
+  border: 1px solid rgba(0, 242, 96, 0.2);
+  padding: 14px 20px;
+  border-radius: 14px;
+  margin-top: 12px;
 }
 
 .network-name {
   font-family: 'JetBrains Mono', monospace;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-green);
   letter-spacing: 1px;
+  font-size: 0.9rem;
 }
 
+/* ── Blockchain loader ─────────────────────────── */
 .blockchain-loader {
   display: flex;
   flex-direction: column;
@@ -139,59 +197,44 @@
 .loader-dots span:nth-child(2) { animation-delay: -0.16s; }
 
 @keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
+  0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+  40%           { transform: scale(1); opacity: 1; }
 }
 
-.success-icon {
-  color: var(--accent);
-}
+/* ── Success / Error icons ─────────────────────── */
+.success-icon { color: var(--accent-green); }
+.error-icon   { color: var(--danger); }
 
-.error-icon {
-  color: var(--danger);
-}
-
+/* ── Transaction details ────────────────────────── */
 .transaction-details {
-  background: var(--background);
-  border: 1px solid var(--border);
-  padding: 16px;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  padding: 16px 20px;
+  border-radius: 14px;
   width: 100%;
-  margin-top: 24px;
+  margin-top: 20px;
   text-align: left;
 }
 
 .tx-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  gap: 12px;
 }
 
-.tx-row:last-child {
-  margin-bottom: 0;
-}
+.tx-row:last-child { margin-bottom: 0; }
 
-.tx-row span:first-child {
-  color: var(--text-secondary);
-}
+.tx-row span:first-child { color: var(--text-muted); flex-shrink: 0; }
+.tx-row span:last-child  { color: var(--text-primary); font-weight: 600; text-align: right; word-break: break-all; }
 
-.mt-4 {
-  margin-top: 24px;
-}
+.mt-4 { margin-top: 20px; }
 
+/* ── Responsive ─────────────────────────────────── */
 @media (max-width: 768px) {
-  .attendance-content {
-    padding: 20px;
-  }
-  .scanner-header {
-    padding: 20px;
-  }
-  .scanner-body {
-    padding: 30px 20px;
-    min-height: 300px;
-  }
-  .scanner-header h2 {
-    font-size: 1.25rem;
-  }
+  .attendance-content { padding: 24px 16px; }
+  .scanner-header     { padding: 24px 20px; }
+  .scanner-body       { padding: 36px 20px; min-height: 280px; }
 }

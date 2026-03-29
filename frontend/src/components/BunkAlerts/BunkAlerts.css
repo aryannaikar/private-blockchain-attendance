@@ -1,7 +1,8 @@
-/* ── Bunk Alerts Section ───────────────────────────── */
-.bunk-alerts-section {
-  margin: 0 0 28px 0;
-}
+/* ═══════════════════════════════════════════════ */
+/*  BunkAlerts — dark glass theme                  */
+/* ═══════════════════════════════════════════════ */
+
+.bunk-alerts-section { margin-bottom: 28px; }
 
 .bunk-alerts-header {
   display: flex;
@@ -17,91 +18,88 @@
 }
 
 .bunk-alerts-title h2 {
-  font-size: 1.05rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #EF4444; /* Red for bunking */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--danger);
   margin: 0;
 }
 
-.bunk-icon {
-  color: #EF4444;
-  flex-shrink: 0;
-}
+.bunk-icon { color: var(--danger); flex-shrink: 0; }
 
 .bunk-badge {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #EF4444;
-  font-size: 0.75rem;
+  background: rgba(255, 78, 80, 0.1);
+  border: 1px solid rgba(255, 78, 80, 0.2);
+  color: var(--danger);
+  font-size: 0.72rem;
   font-weight: 700;
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: 30px;
 }
 
-/* ── Bunk Card ────────────────────────────────────── */
+/* ── Main card ─────────────────────────────────── */
 .bunk-card {
-  background: #FEF2F2; /* Very light red */
-  border: 1px solid #FEE2E2;
-  border-radius: 12px;
+  background: rgba(255, 78, 80, 0.04);
+  border: 1px solid rgba(255, 78, 80, 0.14);
+  border-radius: var(--radius);
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.05);
+  backdrop-filter: blur(8px);
 }
 
 .bunk-description {
-  font-size: 0.88rem;
-  color: #7F1D1D;
+  font-size: 0.82rem;
+  color: var(--text-muted);
   margin-bottom: 16px;
   line-height: 1.5;
-  opacity: 0.8;
 }
 
+/* ── Grid of bunk items ────────────────────────── */
 .bunk-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
 }
 
 .bunk-item {
-  background: white;
-  border: 1px solid #FEE2E2;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 78, 80, 0.12);
+  border-radius: 12px;
   padding: 12px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
-  transition: transform 0.2s;
+  transition: background 0.2s, border-color 0.2s;
 }
 
 .bunk-item:hover {
-  transform: translateY(-2px);
-  border-color: #FECACA;
+  background: rgba(255, 78, 80, 0.07);
+  border-color: rgba(255, 78, 80, 0.25);
 }
 
 .bunk-avatar {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
-  background: #FEE2E2;
+  border-radius: 10px;
+  background: rgba(255, 78, 80, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #EF4444;
+  color: var(--danger);
+  flex-shrink: 0;
 }
 
 .bunk-info h4 {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #111827;
-  margin: 0 0 2px 0;
+  color: var(--text-primary);
+  margin: 0 0 2px;
 }
 
 .bunk-info p {
-  font-size: 0.75rem;
-  color: #6B7280;
+  font-size: 0.74rem;
+  color: var(--text-muted);
   margin: 0;
 }
 
-.bunk-info strong {
-  color: #EF4444;
-}
-
+.bunk-info strong { color: var(--danger); }

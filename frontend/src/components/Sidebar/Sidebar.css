@@ -1,40 +1,105 @@
+/* ═══════════════════════════════════════════════ */
+/*  Sidebar — dark glass, collapsed by default     */
+/* ═══════════════════════════════════════════════ */
 .sidebar {
-  width: 250px;
-  height: calc(100vh - 70px);
+  width: var(--sidebar-collapsed);
+  height: 100vh;
   position: fixed;
   left: 0;
-  top: 70px;
-  background-color: var(--card);
-  border-right: 1px solid var(--border);
+  top: 0;
+  background: rgba(10, 13, 20, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--glass-border);
   display: flex;
   flex-direction: column;
   z-index: 1000;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.02);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Expand on hover (desktop) */
+@media (min-width: 769px) {
+  .sidebar:hover {
+    width: var(--sidebar-w);
+  }
+}
+
+/* ── Brand / Logo ──────────────────────────────── */
 .sidebar-header {
   padding: 24px 20px;
-  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--glass-border);
+  min-height: 76px;
+  flex-shrink: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: rgba(0, 210, 255, 0.08);
+  border: 1px solid rgba(0, 210, 255, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.2);
 }
 
 .sidebar-role {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-secondary);
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s 0.1s;
 }
 
+/* Show text when sidebar is hovered (desktop) */
+@media (min-width: 769px) {
+  .sidebar:hover .sidebar-role { opacity: 1; }
+}
+
+/* ── Nav ─────────────────────────────────────── */
 .sidebar-nav {
   flex: 1;
-  padding: 20px 0;
+  padding: 16px 0;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
+.nav-label {
+  padding: 0 20px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s 0.05s;
+}
+
+@media (min-width: 769px) {
+  .sidebar:hover .nav-label { opacity: 1; }
+}
+
+/* ── Footer / Logout ─────────────────────────── */
 .sidebar-footer {
-  padding: 20px;
-  border-top: 1px solid var(--border);
+  padding: 16px;
+  border-top: 1px solid var(--glass-border);
+  flex-shrink: 0;
 }
 
 .logout-btn {
@@ -42,96 +107,95 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 20px;
+  padding: 10px 12px;
   color: var(--danger);
-  border-radius: var(--radius);
-  font-weight: 500;
-  transition: background 0.2s;
+  background: rgba(255, 78, 80, 0.06);
+  border: 1px solid rgba(255, 78, 80, 0.12);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .logout-btn:hover {
-  background-color: rgba(239, 68, 68, 0.1);
+  background: var(--danger);
+  color: #000;
+  box-shadow: 0 0 20px var(--danger-glow);
 }
 
-/* Mobile Toggles */
+.logout-btn span {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+@media (min-width: 769px) {
+  .sidebar:hover .logout-btn span { opacity: 1; }
+}
+
+/* ── Mobile hamburger ─────────────────────────── */
 .mobile-toggle {
   display: none;
   position: fixed;
-  top: 15px;
-  left: 15px;
+  top: 18px;
+  left: 18px;
   z-index: 2000;
-  background: var(--card);
-  border: 1px solid var(--border);
-  padding: 8px;
-  border-radius: 10px;
-  color: var(--text-primary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: rgba(15, 19, 32, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
 }
 
 .mobile-close-btn {
   display: none;
-  background: rgba(0, 0, 0, 0.05);
-  padding: 6px;
-  border-radius: 8px;
-  color: var(--text-secondary);
-  transition: all 0.2s;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
 }
 
-.mobile-close-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  color: var(--text-primary);
-}
-
-.desktop-only-hidden { display: none; }
-
+/* ── Mobile overlay ───────────────────────────── */
 .sidebar-overlay {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   z-index: 900;
 }
 
+/* ═══════════════════════════════════════════════ */
+/*  Mobile breakpoint                              */
+/* ═══════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .sidebar {
-    top: 0;
-    height: 100vh;
-    box-shadow: 10px 0 20px rgba(0, 0, 0, 0.05);
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* No longer needed as Framer handles 'x' animate */
   .sidebar.open {
-    transform: none;
+    transform: translateX(0);
   }
 
-  .mobile-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .sidebar .sidebar-role,
+  .sidebar .nav-label,
+  .sidebar .logout-btn span {
+    opacity: 1;
   }
 
-  .sidebar-overlay {
-    display: block;
-  }
+  .mobile-toggle { display: flex; }
+
+  .mobile-close-btn { display: flex; }
 
   .sidebar-header {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 20px;
   }
 
-  .mobile-close-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-    background: rgba(0,0,0,0.05);
-    border-radius: 50%;
-  }
+  .sidebar-overlay { display: block; }
 }
-

@@ -8,6 +8,7 @@ const { db } = require("../firebase");
 
 const attendancePath = path.join(__dirname, "../data/attendance.json");
 const sessionPath = path.join(__dirname, "../data/session.json");
+const dismissedPath = path.join(__dirname, "../data/dismissed.json");
 
 // Ensure files exist
 if (!fs.existsSync(attendancePath)) {
@@ -15,6 +16,9 @@ if (!fs.existsSync(attendancePath)) {
 }
 if (!fs.existsSync(sessionPath)) {
   fs.writeFileSync(sessionPath, JSON.stringify({ activeSlot: "Class 1", isOpen: false }, null, 2));
+}
+if (!fs.existsSync(dismissedPath)) {
+  fs.writeFileSync(dismissedPath, JSON.stringify([], null, 2));
 }
 
 // Helper for blockchain calls with timeout
@@ -269,7 +273,14 @@ router.get("/proxy-alerts", async (req, res) => {
       records = JSON.parse(fs.readFileSync(attendancePath));
     }
 
-    const dismissed = JSON.parse(fs.readFileSync(dismissedPath));
+    let dismissed = [];
+    try {
+      if (fs.existsSync(dismissedPath)) {
+        dismissed = JSON.parse(fs.readFileSync(dismissedPath));
+      }
+    } catch (e) {
+      console.error("Failed to read dismissed.json:", e);
+    }
     const dismissedKeys = new Set(dismissed.map(d => `${d.deviceID}||${d.sessionID}`));
 
     const groups = {};
@@ -308,7 +319,14 @@ router.post("/proxy-dismiss", async (req, res) => {
     const { deviceID, sessionID } = req.body;
     if (!deviceID || !sessionID) return res.status(400).json({ error: "Missing IDs" });
 
-    const dismissed = JSON.parse(fs.readFileSync(dismissedPath));
+    let dismissed = [];
+    if (fs.existsSync(dismissedPath)) {
+      try {
+        dismissed = JSON.parse(fs.readFileSync(dismissedPath));
+      } catch (e) {
+        console.error("Failed to read dismissed.json during dismiss:", e);
+      }
+    }
     
     // Avoid duplicates
     if (!dismissed.some(d => d.deviceID === deviceID && d.sessionID === sessionID)) {

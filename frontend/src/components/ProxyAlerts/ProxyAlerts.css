@@ -1,197 +1,229 @@
-/* ── Proxy Alerts Section ───────────────────────────── */
-.proxy-alerts-section {
-  margin: 0 0 28px 0;
-}
+/* ═══════════════════════════════════════════════ */
+/*  ProxyAlerts Component — dark glass theme       */
+/* ═══════════════════════════════════════════════ */
 
-.proxy-alerts-header {
+.proxy-loading {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
+  gap: 10px;
+  padding: 20px 24px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
 }
 
-.proxy-alerts-title {
+/* Main card */
+.proxy-card-v2 {
+  padding: 14px 16px;
+  height: 100%;
+  overflow-y: auto;
+  border: 1px solid var(--glass-border);
+  transition: border-color 0.3s;
+}
+
+.proxy-card-v2.has-alerts {
+  border-color: rgba(255, 78, 80, 0.2);
+  background: rgba(255, 78, 80, 0.03);
+}
+
+/* Header */
+.proxy-header-v2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.proxy-title-group {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.proxy-alerts-title h2 {
-  font-size: 1.05rem;
+.proxy-title-group h3 {
+  font-size: 0.9rem;
   font-weight: 700;
-  color: #F59E0B;
-  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
 }
 
-.proxy-icon {
-  color: #F59E0B;
-  flex-shrink: 0;
-}
+.warning-icon { color: var(--danger); }
 
-.proxy-badge {
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  color: #F59E0B;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 999px;
-}
-
-/* ── Alert Cards ────────────────────────────────────── */
-.proxy-alerts-list {
+/* List */
+.proxy-list-v2 {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
-.proxy-alert-card {
-  background: #FFFBEB;
-  border: 1px solid #FEF3C7;
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.05);
-}
-
-.proxy-alert-card:hover {
-  border-color: #FDE68A;
-  box-shadow: 0 4px 6px rgba(245, 158, 11, 0.1);
-}
-
-.proxy-alert-row {
+/* Empty  */
+.proxy-empty-v2 {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 10px;
+  padding: 36px 24px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+/* Alert item */
+.proxy-item-v2 {
+  display: flex;
   justify-content: space-between;
-  padding: 16px 20px;
-}
-
-.proxy-alert-left {
-  display: flex;
   align-items: center;
-  gap: 14px;
-  cursor: pointer;
-  flex: 1;
-}
-
-.proxy-alert-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.proxy-alert-right {
-  display: flex;
-  align-items: center;
+  padding: 13px 15px;
+  background: rgba(255, 78, 80, 0.04);
+  border: 1px solid rgba(255, 78, 80, 0.1);
+  border-radius: 12px;
   gap: 12px;
-  color: #92400E;
-  cursor: pointer;
+  transition: border-color 0.2s;
 }
 
-.proxy-shield {
-  color: #D97706;
-  flex-shrink: 0;
+.proxy-item-v2:hover { border-color: rgba(255, 78, 80, 0.22); }
+
+.proxy-item-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
 
-.proxy-device-label {
-  font-size: 0.65rem;
-  color: #92400E;
-  margin: 0 0 2px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 700;
-}
-
-.proxy-device-id {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.82rem;
-  color: #451A03;
-  margin: 0;
-  font-weight: 500;
-  opacity: 0.8;
-}
-
-.proxy-student-count {
-  background: #FEE2E2;
-  color: #B91C1C;
-  border: 1px solid #FECACA;
-  border-radius: 8px;
-  padding: 4px 12px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.btn-delete-alert {
-  background: white;
-  border: 1px solid #FEF3C7;
-  color: #B91C1C;
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
+/* Top meta row: device | session | risk */
+.alert-meta-row {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
 }
 
-.btn-delete-alert:hover {
-  background: #FEE2E2;
-  border-color: #FECACA;
-  transform: scale(1.05);
-}
-
-/* ── Expanded Student List ──────────────────────────── */
-.proxy-students-list {
-  padding: 0 20px 20px 50px;
-  border-top: 1px dashed #FEF3C7;
-  margin-top: -4px;
-  padding-top: 16px;
-  background: rgba(255, 255, 255, 0.4);
-}
-
-.proxy-session-info {
-  display: flex;
+.device-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding: 6px 12px;
-  background: #FEF3C7;
-  border-radius: 8px;
-  width: fit-content;
-}
-
-.proxy-session-label {
-  font-size: 0.75rem;
-  color: #92400E;
+  gap: 4px;
+  background: rgba(0, 210, 255, 0.08);
+  color: var(--primary);
+  border: 1px solid rgba(0, 210, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.68rem;
   font-weight: 600;
-  margin: 0;
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.proxy-students-header {
-  font-size: 0.75rem;
-  color: #92400E;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 700;
-  margin-bottom: 10px;
-  opacity: 0.7;
+/* Students label */
+.students-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 2px;
 }
 
-.proxy-student-tags {
+/* Row of student chips */
+.students-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
-.proxy-student-tag {
-  background: white;
-  border: 1px solid #FEF3C7;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #451A03;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+/* Individual student ID chip */
+.student-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 78, 80, 0.1);
+  color: var(--danger);
+  border: 1px solid rgba(255, 78, 80, 0.22);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.3px;
 }
 
+.time-stamp {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.student-id-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+}
+
+.student-id-row .label { color: var(--text-muted); }
+.student-id-row .value { color: var(--text-primary); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.room-risk-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+}
+
+.room     { color: var(--text-secondary); }
+.separator { color: var(--text-muted); }
+
+/* Risk tags */
+.risk-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.risk-tag.high-risk {
+  background: rgba(255, 78, 80, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(255, 78, 80, 0.25);
+}
+
+.risk-tag.med-risk {
+  background: rgba(251, 191, 36, 0.1);
+  color: var(--warn);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+/* Action buttons */
+.proxy-item-right { flex-shrink: 0; }
+
+.action-buttons { display: flex; gap: 6px; }
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.action-btn.resolve {
+  background: rgba(0, 242, 96, 0.1);
+  color: var(--accent-green);
+  border: 1px solid rgba(0, 242, 96, 0.2);
+}
+
+.action-btn.resolve:hover { background: var(--accent-green); color: #000; }
+
+.action-btn.dismiss {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  border: 1px solid var(--glass-border);
+}
+
+.action-btn.dismiss:hover { background: var(--danger); color: #fff; }
