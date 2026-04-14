@@ -1,7 +1,12 @@
 node_modules
-.env
+.env*
 build
 dist
 .expo
 android/.gradle
 android/app/build
+# Firebase/Blockchain Keys
+backend/serviceAccountKey.json
+*.json.bak
+*.log
+*.yml
