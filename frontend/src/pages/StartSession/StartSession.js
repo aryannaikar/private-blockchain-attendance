@@ -110,8 +110,12 @@ const StartSession = () => {
       setSessionActive(true);
       setStatusMsg(`Session started for ${activeSlot}`);
       setMsgType('success');
-    } catch {
-      setStatusMsg('Failed to start session.');
+    } catch (err) {
+      console.error("Start Session Error:", err);
+      const errorMsg = err.response && err.response.data && err.response.data.error 
+        ? err.response.data.error 
+        : err.message;
+      setStatusMsg(`Failed to start session: ${errorMsg}`);
       setMsgType('error');
     }
   };
@@ -125,9 +129,13 @@ const StartSession = () => {
       setSessionActive(false);
       setStatusMsg(`Session closed for ${activeSlot}`);
       setMsgType('success');
-    } catch {
+    } catch (err) {
+      console.error("End Session Error:", err);
       setSessionActive(false);
-      setStatusMsg('Session ended.');
+      const errorMsg = err.response && err.response.data && err.response.data.error 
+        ? err.response.data.error 
+        : err.message;
+      setStatusMsg(`Session ended with error: ${errorMsg}`);
     }
   };
 

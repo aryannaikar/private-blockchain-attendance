@@ -46,6 +46,8 @@ const MarkAttendance = () => {
   }, [rollNo]);
 
   const startScan = async () => {
+    if (scanState !== 'idle' && scanState !== 'error') return; // Prevent double clicks
+    
     setScanState('scanning');
     setErrorMsg('');
 
@@ -101,8 +103,16 @@ const MarkAttendance = () => {
       } catch (err) {
         console.error("Mark Attendance Error:", err);
         const msg = err?.response?.data?.error || err.message || 'Failed to record attendance.';
-        setErrorMsg(msg);
-        setScanState('error');
+        
+        // If the backend says it was already recorded, just show them the success screen gracefully!
+        if (msg.includes('already recorded')) {
+          const existingHash = err?.response?.data?.txHash || 'ALREADY_RECORDED';
+          setTxHash(existingHash);
+          setScanState('success');
+        } else {
+          setErrorMsg(msg);
+          setScanState('error');
+        }
       }
     }, 1500);
   };

@@ -98,12 +98,15 @@ const AttendanceHistory = () => {
 
         {/* Filter Toolbar */}
         <section className="filter-toolbar premium-shadow">
-          <div className="filter-group">
-            <label><Filter size={12} /> Teacher</label>
-            <select value={filterTeacher} onChange={e => setFilterTeacher(e.target.value)}>
-              {teachers.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </div>
+          {/* Only students see the Teacher filter (teachers always see only their own) */}
+          {role === 'student' && (
+            <div className="filter-group">
+              <label><Filter size={12} /> Teacher</label>
+              <select value={filterTeacher} onChange={e => setFilterTeacher(e.target.value)}>
+                {teachers.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          )}
 
           <div className="filter-group">
             <label><Clock size={12} /> Day</label>

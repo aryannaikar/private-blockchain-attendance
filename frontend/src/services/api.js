@@ -38,9 +38,11 @@ export const markAttendanceTeacher = (studentID) =>
 export const markAttendanceStudent = (rollNo, deviceID, sessionID) =>
   studentAPI.post('/attendance/mark', { role: 'student', rollNo, deviceID, sessionID });
 
-// All records (teacher view) → Teacher Node (port 4000)
-export const getAllAttendance = () =>
-  teacherAPI.get('/attendance/all');
+// All records (teacher view — only their own) → Teacher Node (port 4000)
+export const getAllAttendance = () => {
+  const teacherID = localStorage.getItem('rollNo') || '';
+  return teacherAPI.get('/attendance/all', { params: { teacherID } });
+};
 
 // Student's own records → Student Node (port 3000)
 export const getMyAttendance = (rollNo) =>
@@ -73,8 +75,10 @@ export const resetAttendance = () => teacherAPI.post('/attendance/reset');
 
 // ── Proxy Detection ─────────────────────────────────────────────────────────
 // Get proxy alerts (teacher) → Teacher Node (port 4000)
-export const getProxyAlerts = () =>
-  teacherAPI.get('/attendance/proxy-alerts');
+export const getProxyAlerts = () => {
+  const teacherID = localStorage.getItem('rollNo') || '';
+  return teacherAPI.get('/attendance/proxy-alerts', { params: { teacherID } });
+};
 
 // Get bunk alerts (teacher) → Teacher Node (port 4000)
 export const getBunkAlerts = () =>

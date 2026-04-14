@@ -10,6 +10,17 @@ const AttendanceTable = ({ data = [] }) => {
     return val;
   };
 
+  // Calculate duplicate device IDs within the same session
+  const duplicateMap = {};
+  data.forEach(r => {
+    if (!r.deviceID || r.deviceID === 'unknown' || !r.sessionID) return;
+    const key = `${r.deviceID}||${r.sessionID}`;
+    if (!duplicateMap[key]) {
+      duplicateMap[key] = new Set();
+    }
+    duplicateMap[key].add(r.studentID);
+  });
+
   const filteredData = data.filter(item => 
     item.studentID?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.teacherName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -43,50 +54,65 @@ const AttendanceTable = ({ data = [] }) => {
               <th><User size={14} /> Teacher</th>
               <th><Clock size={14} /> Date & Time</th>
               <th><Smartphone size={14} /> Device</th>
-              <th><Hash size={14} /> Status</th>
+              <th className="status-th"><Hash size={14} /> Status</th>
             </tr>
           </thead>
           <tbody>
             {filteredData.length > 0 ? (
-              filteredData.map((record, index) => (
-                <tr key={index} className="table-row">
-                  <td className="student-id-cell">{record.studentID}</td>
-                  <td>
-                    <span className={`session-pill ${!record.sessionID || record.sessionID === '...' ? 'placeholder' : ''}`}>
-                      {cleanValue(record.sessionID)}
-                    </span>
-                  </td>
-                  <td className="teacher-name">{cleanValue(record.teacherName)}</td>
-                  <td className="timestamp-cell">
-                    {record.timestamp ? (
-                      <div className="time-display">
-                        <span className="date-part">{new Date(record.timestamp).toLocaleDateString()}</span>
-                        <span className="time-part">{new Date(record.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              filteredData.map((record, index) => {
+                const proxyKey = `${record.deviceID}||${record.sessionID}`;
+                const isProxy = duplicateMap[proxyKey] && duplicateMap[proxyKey].size > 1;
+
+                return (
+                  <tr key={index} className={`table-row ${isProxy ? 'proxy-row' : ''}`}>
+                    <td className="student-id-cell">
+                      {record.studentID}
+                      {isProxy && (
+                        <div className="proxy-mini-badge">
+                           <Hash size={8} /> PROXY
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`session-pill ${!record.sessionID || record.sessionID === '...' ? 'placeholder' : ''}`}>
+                        {cleanValue(record.sessionID)}
+                      </span>
+                    </td>
+                    <td className="teacher-name">{cleanValue(record.teacherName)}</td>
+                    <td className="timestamp-cell">
+                      {record.timestamp ? (
+                        <div className="time-display">
+                          <span className="date-part">{new Date(record.timestamp).toLocaleDateString()}</span>
+                          <span className="time-part">{new Date(record.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      ) : '—'}
+                    </td>
+                    <td className={`device-id-cell ${isProxy ? 'proxy-hardware' : ''}`}>
+                      <div className="device-id-wrapper">
+                        {isProxy && <Smartphone size={10} className="hazard-icon" />}
+                        <span title={record.deviceID}>
+                          {record.deviceID && record.deviceID !== 'unknown' 
+                            ? `${record.deviceID.substring(0, 10)}...` 
+                            : '—'}
+                        </span>
                       </div>
-                    ) : '—'}
-                  </td>
-                  <td className="device-id-cell">
-                    <span title={record.deviceID}>
-                      {record.deviceID && record.deviceID !== 'unknown' 
-                        ? `${record.deviceID.substring(0, 6)}...` 
-                        : '—'}
-                    </span>
-                  </td>
-                  <td>
-                    {record.blockNumber && record.blockNumber !== '—' ? (
-                      <div className="status-badge on-chain">
-                        <ShieldCheck size={14} />
-                        <span>#{record.blockNumber}</span>
-                      </div>
-                    ) : (
-                      <div className="status-badge local-fallback">
-                        <Clock size={12} />
-                        <span>LOCAL</span>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))
+                    </td>
+                    <td>
+                      {record.blockNumber && record.blockNumber !== '—' ? (
+                        <div className="status-badge on-chain">
+                          <ShieldCheck size={14} />
+                          <span>#{record.blockNumber}</span>
+                        </div>
+                      ) : (
+                        <div className="status-badge local-fallback">
+                          <Clock size={12} />
+                          <span>LOCAL</span>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan="6" className="empty-state">
