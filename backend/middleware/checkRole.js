@@ -6,7 +6,7 @@
  * the node's configured ROLE, preventing cross-node abuse.
  */
 
-const NODE_ROLE = process.env.ROLE;
+const NODE_ROLE = process.env.NODE_ROLE || process.env.ROLE;
 
 function checkRole(req, res, next) {
 

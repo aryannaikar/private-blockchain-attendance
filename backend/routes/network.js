@@ -2,12 +2,13 @@ const express = require("express");
 const router = express.Router();
 const { ethers } = require("ethers");
 
+const { db } = require("../firebase");
+
 // connect to Hardhat blockchain
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 
 router.get("/status", async (req, res) => {
   try {
-
     const network = await provider.getNetwork();
     const blockNumber = await provider.getBlockNumber();
 
@@ -16,6 +17,7 @@ router.get("/status", async (req, res) => {
       chainId: network.chainId.toString(),
       blockNumber: blockNumber,
       rpc: "http://127.0.0.1:8545",
+      firebaseStatus: db ? "connected" : "offline",
       message: "Connected to private blockchain network"
     });
 

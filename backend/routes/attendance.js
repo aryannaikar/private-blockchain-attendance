@@ -99,16 +99,15 @@ router.post("/active-session", async (req, res) => {
 
     // 2. Synchronize to Global Firestore (Non-blocking response)
     if (db) {
-      // We don't necessarily need to 'await' this for the user response, 
-      // but we do it to ensure consistency. However, we wrap it in its own try/catch.
       try {
-        console.log("🌐 Syncing session to Firestore...");
+        console.log(`🌐 SYNC: Uploading session to Firestore (Slot: ${activeSlot}, Teacher: ${teacherID || "unknown"})`);
         await db.collection("metadata").doc("activeSession").set(sessionData);
-        console.log("🚀 Firestore synchronization successful.");
+        console.log("🚀 SYNC: Firestore update SUCCESSFUL");
       } catch (dbErr) {
-        console.error("❌ Firestore sync failed:", dbErr.message);
-        // Do NOT fail the whole request if sync fails; local state is preserved.
+        console.error("❌ SYNC: Firestore update FAILED:", dbErr.message);
       }
+    } else {
+      console.warn("⚠️ SYNC: Firebase NOT CONNECTED. Session saved LOCALLY ONLY.");
     }
 
     res.json({ message: `Active slot set to ${activeSlot}`, session: sessionData });
@@ -254,34 +253,49 @@ router.post("/mark", checkRole, async (req, res) => {
     fs.writeFileSync(attendancePath, JSON.stringify(localAttendance.sort((a,b) => b.timestamp - a.timestamp), null, 2));
 
     // 1. Attempt Blockchain Record
-    let tx;
     try {
-      tx = await withTimeout(contract.markAttendance(idToMark), 8000);
+      console.log(`⛓️ BLOCKCHAIN: Recording attendance for ${idToMark}...`);
+      const tx = await withTimeout(contract.markAttendance(idToMark), 8000);
       attendanceRecord.txHash = tx.hash;
       attendanceRecord.status = "confirmed";
-      
-      // Update local record with real TX hash
-      const idx = localAttendance.findIndex(r => r.txHash === tempTxHash);
-      if (idx !== -1) localAttendance[idx] = attendanceRecord;
-      fs.writeFileSync(attendancePath, JSON.stringify(localAttendance, null, 2));
+      console.log(`✅ BLOCKCHAIN: Confirmed (Hash: ${tx.hash.slice(0, 10)}...)`);
+    } catch (bcError) {
+      console.warn(`⚠️ BLOCKCHAIN: Sync failed or timed out: ${bcError.message}`);
+      attendanceRecord.status = "pending";
+      // txHash remains the temp "local_" hash
+    }
 
-      // 2. Database Record (Firebase)
-      if (db) {
+    // 2. Finalize Local Record
+    const idx = localAttendance.findIndex(r => r.txHash === tempTxHash);
+    if (idx !== -1) localAttendance[idx] = attendanceRecord;
+    fs.writeFileSync(attendancePath, JSON.stringify(localAttendance, null, 2));
+
+    // 3. Database Record (Firebase) — ALWAYS TRY TO SYNC
+    if (db) {
+      try {
+        console.log(`🌐 SYNC: Uploading ${attendanceRecord.status} record for ${idToMark} to Firestore...`);
         await db.collection("attendance").add(attendanceRecord);
+        console.log("🚀 SYNC: Firestore upload SUCCESSFUL");
+      } catch (fbErr) {
+        console.error("❌ SYNC: Firestore upload FAILED:", fbErr.message);
       }
+    } else {
+      console.warn("⚠️ SYNC: Firebase NOT CONNECTED. Sync skipped.");
+    }
 
+    // 4. Return Response
+    if (attendanceRecord.status === "confirmed") {
       res.json({
         message: `Attendance marked for ${currentSession} (Blockchain Confirmed)`,
-        txHash: tx.hash
+        txHash: attendanceRecord.txHash,
+        status: "confirmed"
       });
-
-    } catch (bcError) {
-      console.error("Blockchain error during mark:", bcError.message);
-      // Return success but notify it's recorded locally only
+    } else {
       res.json({
-        message: `Attendance recorded locally for ${currentSession} (Blockchain sync pending/failed)`,
-        txHash: tempTxHash,
-        warning: "Blockchain connection unstable. Record saved locally."
+        message: `Attendance recorded for ${currentSession} (Blockchain Pending/Local Only)`,
+        txHash: attendanceRecord.txHash,
+        status: "pending",
+        warning: "Blockchain connection unstable. Record saved to cloud sync only."
       });
     }
 
