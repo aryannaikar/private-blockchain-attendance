@@ -2,7 +2,13 @@ require("dotenv").config();
 const { ethers } = require("ethers");
 const abi = require("./AttendanceABI.json");
 
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+// Hardhat's default chainId is 31337. Using staticNetwork prevents crashes on startup if the node is temporarily unavailable.
+const provider = new ethers.JsonRpcProvider(process.env.RPC_URL, {
+  chainId: 31337,
+  name: "hardhat"
+}, {
+  staticNetwork: true
+});
 
 const wallet = new ethers.Wallet(
   process.env.PRIVATE_KEY,

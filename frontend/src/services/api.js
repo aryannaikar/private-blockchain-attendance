@@ -88,4 +88,8 @@ export const getBunkAlerts = () =>
 export const dismissProxyAlert = (deviceID, sessionID) =>
   teacherAPI.post('/attendance/proxy-dismiss', { deviceID, sessionID });
 
+// Send absentee emails (teacher) → Teacher Node (port 4000)
+export const sendAbsenteeEmails = (data) =>
+  teacherAPI.post('/attendance/send-absentee-emails', data);
+
 export default API;

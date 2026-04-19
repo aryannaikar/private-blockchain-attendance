@@ -4,9 +4,9 @@
     "sessionID": "Class 1",
     "teacherID": "SUHAS LAWAND",
     "teacherName": "Suhas Lawand",
-    "deviceID": "f138ad659eb742f7ecdd0842d1a8e1d2",
-    "timestamp": 1776612569859,
-    "txHash": "0x7bc2ed1774fb0974fbdb7777c7ec32225face4ad1ddb3dd38836177347350963",
+    "deviceID": "d9029560e507bfb934e92c95b68ef39f",
+    "timestamp": 1776620518738,
+    "txHash": "0x950d310848fcf5d65e535593e262af6318a7fa5f88191a2fa0ac14a5e8c3c791",
     "markedBy": "student",
     "status": "confirmed"
   }

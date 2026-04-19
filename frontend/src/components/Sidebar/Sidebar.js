@@ -48,6 +48,12 @@ const Sidebar = ({ role }) => {
         { to: '/admin/history',   icon: History,         label: 'All Attendance' },
       ];
     }
+    if (role === 'parent') {
+      return [
+        { to: '/parent',         icon: LayoutDashboard, label: 'Child Dashboard' },
+        { to: '/parent/history', icon: Clock,           label: 'Child History' },
+      ];
+    }
     return [];
   };
 

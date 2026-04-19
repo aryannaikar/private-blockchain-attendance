@@ -1,0 +1,141 @@
+/* ── PARENT DASHBOARD CSS ── */
+
+.stat-card {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-info p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.stat-info h3 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.visual-card {
+  padding: 24px;
+  height: 100%;
+}
+
+.visual-card h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chart-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.big-val {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* ── History Table ────────────────────────── */
+
+.history-section-v2 {
+  padding: 24px;
+  margin-top: 20px;
+}
+
+.history-table-wrapper {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.history-table th {
+  padding: 12px 16px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.history-table td {
+  padding: 16px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.success {
+  background: rgba(0, 210, 255, 0.1);
+  color: var(--primary);
+}
+
+.status-badge.danger {
+  background: rgba(255, 78, 80, 0.1);
+  color: var(--error);
+}
+
+.tx-hash {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.empty-row {
+  text-align: center;
+  padding: 40px !important;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+@media (max-width: 1024px) {
+  .summary-row {
+    flex-direction: column;
+  }
+}

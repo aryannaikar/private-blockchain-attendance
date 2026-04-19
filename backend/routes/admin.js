@@ -11,7 +11,7 @@ router.post("/create-user", async (req, res) => {
 
   try {
 
-    const { name, rollNo, password, role } = req.body;
+    const { name, rollNo, password, role, parentName, parentEmail, parentID, parentPassword } = req.body;
 
     if (!role || !["student", "teacher"].includes(role)) {
       return res.status(400).json({ error: "Invalid role specified" });
@@ -40,6 +40,10 @@ router.post("/create-user", async (req, res) => {
       rollNo,
       password,
       role,
+      parentName: role === "student" ? parentName : undefined,
+      parentEmail: role === "student" ? parentEmail : undefined,
+      parentID: role === "student" ? parentID : undefined,
+      parentPassword: role === "student" ? parentPassword : undefined,
       createdAt: new Date().toISOString()
     };
 

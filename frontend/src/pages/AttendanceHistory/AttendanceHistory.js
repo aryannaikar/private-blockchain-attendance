@@ -23,7 +23,7 @@ const AttendanceHistory = () => {
     setError('');
     try {
       let res;
-      if (role === 'student') {
+      if (role === 'student' || role === 'parent') {
         res = await getMyAttendance(rollNo);
       } else {
         res = await getAllAttendance();
@@ -124,7 +124,7 @@ const AttendanceHistory = () => {
             </div>
             <h1>Attendance History</h1>
             <p className="subtitle">
-              {role === 'student'
+              {role === 'student' || role === 'parent'
                 ? `Detailed logs for student ${rollNo}`
                 : 'Manage and filter attendance by teacher, day, or class slot.'}
             </p>
@@ -143,8 +143,8 @@ const AttendanceHistory = () => {
 
         {/* Filter Toolbar */}
         <section className="filter-toolbar premium-shadow">
-          {/* Only students see the Teacher filter (teachers always see only their own) */}
-          {role === 'student' && (
+          {/* Only students/parents see the Teacher filter (teachers always see only their own) */}
+          {(role === 'student' || role === 'parent') && (
             <div className="filter-group">
               <label><Filter size={12} /> Teacher</label>
               <select value={filterTeacher} onChange={e => setFilterTeacher(e.target.value)}>

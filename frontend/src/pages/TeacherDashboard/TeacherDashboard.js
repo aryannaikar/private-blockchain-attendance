@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users, UserCheck, Database, PlayCircle, History, RefreshCw, Network,
@@ -12,22 +12,6 @@ import ProxyAlerts from '../../components/ProxyAlerts/ProxyAlerts';
 import { getAllAttendance, getNetworkStatus, teacherAPI } from '../../services/api';
 import './TeacherDashboard.css';
 
-/* ── Static demo / fallback chart data ─ */
-const lineData = [
-  { time: '09:00', value: 40 },
-  { time: '09:15', value: 55 },
-  { time: '09:30', value: 75 },
-  { time: '09:45', value: 88 },
-  { time: '10:00', value: 96 },
-];
-
-const barData = [
-  { day: 'Mon', value: 85 },
-  { day: 'Tue', value: 78 },
-  { day: 'Wed', value: 92 },
-  { day: 'Thu', value: 88 },
-  { day: 'Fri', value: 70 },
-];
 
 const TeacherDashboard = () => {
   const name = localStorage.getItem('name') || 'Teacher';
@@ -55,6 +39,40 @@ const TeacherDashboard = () => {
 
   const unique = [...new Set(records.filter(r => !r.proxyDetected).map(r => r.studentID))].length;
   const validRecords = records.filter(r => !r.proxyDetected);
+  const totalStudents = 10; // Target total for percentage calculation
+
+  // 1. Weekly Bar Data
+  const daysArr = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayCounts = { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0 };
+  
+  validRecords.forEach(r => {
+    let ts = Number(r.timestamp);
+    if (ts && ts < 1e11) ts *= 1000;
+    const d = new Date(ts);
+    const dayName = daysArr[d.getDay()];
+    if (dayCounts[dayName] !== undefined) dayCounts[dayName]++;
+  });
+
+  const barData = Object.keys(dayCounts).map(day => ({
+    day,
+    value: Math.min(100, Math.round((dayCounts[day] / totalStudents) * 100))
+  }));
+
+  // 2. Trend Line Data (Most recent session's markers over time)
+  const lineData = useMemo(() => {
+    if (validRecords.length === 0) return [];
+    return [...validRecords]
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .slice(-10)
+      .map((r, i) => {
+        let ts = Number(r.timestamp);
+        if (ts && ts < 1e11) ts *= 1000;
+        return {
+          time: new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          value: Math.round(((i + 1) / totalStudents) * 100)
+        };
+      });
+  }, [validRecords]);
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });

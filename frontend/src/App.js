@@ -12,6 +12,7 @@ import TeacherDashboard from './pages/TeacherDashboard/TeacherDashboard';
 import StartSession from './pages/StartSession/StartSession';
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import ManageUsers from './pages/ManageUsers/ManageUsers';
+import ParentDashboard from './pages/ParentDashboard/ParentDashboard';
 import NotFound from './pages/NotFound/NotFound';
 
 function App() {
@@ -33,6 +34,9 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<ManageUsers />} />
           <Route path="/admin/history" element={<AttendanceHistory />} />
+
+          <Route path="/parent" element={<ParentDashboard />} />
+          <Route path="/parent/history" element={<AttendanceHistory />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -97,7 +97,9 @@ button { cursor: pointer; border: none; font-family: inherit; background: none; 
 .col-12 { grid-column: span 12; }
 .col-10 { grid-column: span 10; }
 .col-8  { grid-column: span 8; }
+.col-7  { grid-column: span 7; }
 .col-6  { grid-column: span 6; }
+.col-5  { grid-column: span 5; }
 .col-4  { grid-column: span 4; }
 .col-3  { grid-column: span 3; }
 

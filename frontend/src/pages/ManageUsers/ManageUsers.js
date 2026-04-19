@@ -8,7 +8,16 @@ const ManageUsers = () => {
   const [users,       setUsers]      = useState([]);
   const [searchTerm,  setSearchTerm]  = useState('');
   const [showForm,    setShowForm]    = useState(false);
-  const [form,        setForm]        = useState({ name: '', rollNo: '', password: '', role: 'student' });
+  const [form,        setForm]        = useState({ 
+    name: '', 
+    rollNo: '', 
+    password: '', 
+    role: 'student',
+    parentName: '',
+    parentEmail: '',
+    parentID: '',
+    parentPassword: ''
+  });
   const [msg,         setMsg]         = useState('');
   const [msgType,     setMsgType]     = useState('');
   const [loading,     setLoading]     = useState(false);
@@ -43,7 +52,10 @@ const ManageUsers = () => {
       await createUser(form);
       setMsgType('success');
       setMsg(`✅ ${form.role.charAt(0).toUpperCase() + form.role.slice(1)} "${form.name}" registered.`);
-      setForm({ name: '', rollNo: '', password: '', role: 'student' });
+      setForm({ 
+        name: '', rollNo: '', password: '', role: 'student',
+        parentName: '', parentEmail: '', parentID: '', parentPassword: ''
+      });
       setShowForm(false);
       fetchUsers(); // Refresh list
     } catch (err) {
@@ -169,6 +181,37 @@ const ManageUsers = () => {
                   value={form.password} onChange={e => setForm({ ...form, password: e.target.value })}
                   className="modal-input"
                 />
+
+                {form.role === 'student' && (
+                  <>
+                    <hr style={{ border: '0', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '8px 0' }} />
+                    <p style={{ color: 'var(--primary)', fontSize: '0.8rem', fontWeight: '800', marginBottom: '4px' }}>PARENT DETAILS</p>
+                    <input
+                      type="text" placeholder="Parent Name" required
+                      value={form.parentName} onChange={e => setForm({ ...form, parentName: e.target.value })}
+                      className="modal-input"
+                    />
+                    <input
+                      type="email" placeholder="Parent Email" required
+                      value={form.parentEmail} onChange={e => setForm({ ...form, parentEmail: e.target.value })}
+                      className="modal-input"
+                    />
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input
+                        type="text" placeholder="Parent ID" required
+                        value={form.parentID} onChange={e => setForm({ ...form, parentID: e.target.value })}
+                        className="modal-input"
+                        style={{ flex: 1 }}
+                      />
+                      <input
+                        type="text" placeholder="Parent Pass" required
+                        value={form.parentPassword} onChange={e => setForm({ ...form, parentPassword: e.target.value })}
+                        className="modal-input"
+                        style={{ flex: 1 }}
+                      />
+                    </div>
+                  </>
+                )}
                 <button type="submit" className="btn-primary-icon" disabled={loading}>
                   {loading ? 'Registering…' : `Register ${form.role.charAt(0).toUpperCase() + form.role.slice(1)}`}
                 </button>

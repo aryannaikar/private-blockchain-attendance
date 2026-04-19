@@ -9,6 +9,9 @@ const { db } = require("../firebase");
 const attendancePath = path.join(__dirname, "../data/attendance.json");
 const sessionPath = path.join(__dirname, "../data/session.json");
 const dismissedPath = path.join(__dirname, "../data/dismissed.json");
+const usersPath = path.join(__dirname, "../data/users.json");
+
+const { sendAbsenteeEmail } = require("../utils/mailer");
 
 // Ensure files exist
 if (!fs.existsSync(attendancePath)) {
@@ -531,6 +534,64 @@ router.post("/proxy-dismiss", async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// SEND ABSENTEE EMAILS
+router.post("/send-absentee-emails", async (req, res) => {
+  try {
+    const { teacherID, teacherName, sessionID } = req.body;
+    
+    // 1. Get all registered students
+    let allUsers = [];
+    if (db) {
+      const snapshot = await db.collection("users").where("role", "==", "student").get();
+      allUsers = snapshot.docs.map(doc => doc.data());
+    } else {
+      allUsers = JSON.parse(fs.readFileSync(usersPath)).filter(u => u.role === "student");
+    }
+
+    // 2. Get students present in this session
+    let presentRecords = [];
+    if (db) {
+      const snapshot = await db.collection("attendance")
+        .where("sessionID", "==", sessionID)
+        .where("teacherID", "==", teacherID)
+        .get();
+      presentRecords = snapshot.docs.map(doc => doc.data());
+    } else {
+      const localAttendance = JSON.parse(fs.readFileSync(attendancePath));
+      presentRecords = localAttendance.filter(r => r.sessionID === sessionID && r.teacherID === teacherID);
+    }
+
+    const presentStudentIDs = new Set(presentRecords.map(r => r.studentID));
+
+    // 3. Find absentees who have parent emails
+    const absentees = allUsers.filter(u => !presentStudentIDs.has(u.rollNo) && u.parentEmail);
+
+    console.log(`📧 Found ${absentees.length} absentees with parent emails.`);
+
+    // 4. Send emails
+    const emailPromises = absentees.map(student => 
+      sendAbsenteeEmail(
+        student.parentEmail,
+        student.name,
+        teacherName || "Teacher",
+        sessionID,
+        new Date().toLocaleTimeString()
+      ).catch(err => {
+        console.error(`Failed to send email to ${student.parentEmail}:`, err.message);
+        return null;
+      })
+    );
+
+    await Promise.all(emailPromises);
+
+    res.json({ message: `Emails processed for ${absentees.length} absentees.` });
+
+  } catch (err) {
+    console.error("❌ Send Absentee Emails Error:", err);
+    res.status(500).json({ error: "Failed to send absentee emails" });
   }
 });
 

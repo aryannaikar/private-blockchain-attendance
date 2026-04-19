@@ -6,25 +6,6 @@
     "role": "admin"
   },
   {
-    "name": "Rahul",
-    "rollNo": "STU001",
-    "password": "1234",
-    "role": "student"
-  },
-  {
-    "name": "Aryan Naikar",
-    "rollNo": "32",
-    "password": "32",
-    "role": "student"
-  },
-  {
-    "name": "Sakshi",
-    "rollNo": "36",
-    "password": "36",
-    "role": "student",
-    "createdAt": "2026-03-08T19:06:49.945Z"
-  },
-  {
     "name": "Leena Patil",
     "rollNo": "LEENA",
     "password": "123",
@@ -32,39 +13,11 @@
     "createdAt": "2026-03-15T15:24:17.689Z"
   },
   {
-    "name": "Rochelle Dsa",
-    "rollNo": "10",
-    "password": "10",
-    "role": "student",
-    "createdAt": "2026-03-29T12:21:03.221Z"
-  },
-  {
-    "name": "sumeet",
-    "rollNo": "17",
-    "password": "17",
-    "role": "student",
-    "createdAt": "2026-03-29T12:35:49.189Z"
-  },
-  {
     "name": "lalita",
     "rollNo": "LALITA",
     "password": "123",
     "role": "teacher",
     "createdAt": "2026-03-29T12:36:07.122Z"
-  },
-  {
-    "name": "sid",
-    "rollNo": "33",
-    "password": "33",
-    "role": "student",
-    "createdAt": "2026-03-29T12:51:58.633Z"
-  },
-  {
-    "name": "samiksha",
-    "rollNo": "11",
-    "password": "11",
-    "role": "student",
-    "createdAt": "2026-03-29T12:55:54.174Z"
   },
   {
     "name": "Suhas Lawand",

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   PlayCircle, Square, Bluetooth, Users, Clock,
-  AlertCircle, Usb, Trash2, Layers, CheckCircle2
+  AlertCircle, Usb, Trash2, Layers, CheckCircle2, Mail
 } from 'lucide-react';
 import Sidebar from '../../components/Sidebar/Sidebar';
-import { markAttendanceTeacher, getActiveSession, setActiveSession, resetAttendance } from '../../services/api';
+import { markAttendanceTeacher, getActiveSession, setActiveSession, resetAttendance, sendAbsenteeEmails } from '../../services/api';
 import './StartSession.css';
 
 const CLASS_SLOTS = ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5'];
@@ -18,6 +18,7 @@ const StartSession = () => {
   const [activeSlot,    setActiveSlot]    = useState('Class 1');
   const [port,          setPort]          = useState(null);
   const [serialError,   setSerialError]   = useState('');
+  const [mailLoading,   setMailLoading]   = useState(false);
 
   const isSerialSupported = 'serial' in navigator;
 
@@ -168,6 +169,24 @@ const StartSession = () => {
     }
   };
 
+  const handleSendMails = async () => {
+    if (!window.confirm('Send absentee emails to parents for this session?')) return;
+    setMailLoading(true);
+    setStatusMsg('Finding absentees and sending emails...');
+    try {
+      const teacherID = localStorage.getItem('rollNo');
+      const teacherName = localStorage.getItem('name');
+      const res = await sendAbsenteeEmails({ teacherID, teacherName, sessionID: activeSlot });
+      setMsgType('success');
+      setStatusMsg(res.data.message);
+    } catch (err) {
+      setMsgType('error');
+      setStatusMsg(err?.response?.data?.error || 'Failed to send emails');
+    } finally {
+      setMailLoading(false);
+    }
+  };
+
   /* ── Render ──────────────────────────────── */
   return (
     <div className="dashboard-layout">
@@ -226,10 +245,20 @@ const StartSession = () => {
                 </div>
               </div>
 
-              <div className="control-actions">
+              <div className="control-actions" style={{ display: 'flex', gap: '12px' }}>
                 <button className="btn-primary" disabled={!sessionActive}>
                   <CheckCircle2 size={17} /> Verify Now
                 </button>
+                {!sessionActive && (
+                  <button 
+                    className="btn-secondary" 
+                    onClick={handleSendMails} 
+                    disabled={mailLoading}
+                    style={{ border: '1px solid var(--primary)', color: 'var(--primary)', gap: '8px' }}
+                  >
+                    <Mail size={17} /> {mailLoading ? 'Sending...' : 'Mail Absentees'}
+                  </button>
+                )}
               </div>
             </div>
           </div>
