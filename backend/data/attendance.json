@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "studentID": "32",
+    "sessionID": "Class 1",
+    "teacherID": "SUHAS LAWAND",
+    "teacherName": "Suhas Lawand",
+    "deviceID": "f138ad659eb742f7ecdd0842d1a8e1d2",
+    "timestamp": 1776612569859,
+    "txHash": "0x7bc2ed1774fb0974fbdb7777c7ec32225face4ad1ddb3dd38836177347350963",
+    "markedBy": "student",
+    "status": "confirmed"
+  }
+]

@@ -33,8 +33,9 @@ const StudentDashboard = () => {
 
   useEffect(() => { load(); }, [load]);
 
+  const validRecords   = records.filter(r => !r.proxyDetected);
   const totalPossible  = 40;
-  const totalPresent   = records.length;
+  const totalPresent   = validRecords.length;
   const attendancePct  = totalPossible
     ? Math.min(100, Math.round((totalPresent / totalPossible) * 100))
     : 0;

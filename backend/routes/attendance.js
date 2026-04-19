@@ -25,8 +25,39 @@ if (!fs.existsSync(dismissedPath)) {
 const withTimeout = (promise, ms = 5000) => {
   return Promise.race([
     promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error("Blockchain timeout")), ms))
+    new Promise((_, reject) => setTimeout(() => reject(new Error(`Blockchain timeout after ${ms}ms`)), ms))
   ]);
+};
+
+// Helper: flag records as proxy if same deviceID used by multiple students in same session
+const flagProxyRecords = (records) => {
+  // Group by deviceID + sessionID
+  const groups = {};
+  for (const r of records) {
+    const device = r.deviceID || "unknown";
+    const session = r.sessionID || "default";
+    if (device === "unknown") continue;
+    const key = `${device}||${session}`;
+    if (!groups[key]) groups[key] = new Set();
+    groups[key].add(r.studentID);
+  }
+
+  // Find which device+session combos have multiple different students
+  const proxyKeys = new Set();
+  for (const [key, students] of Object.entries(groups)) {
+    if (students.size > 1) proxyKeys.add(key);
+  }
+
+  // Flag each record
+  return records.map(r => {
+    const device = r.deviceID || "unknown";
+    const session = r.sessionID || "default";
+    const key = `${device}||${session}`;
+    return {
+      ...r,
+      proxyDetected: device !== "unknown" && proxyKeys.has(key)
+    };
+  });
 };
 
 // GET ACTIVE SESSION
@@ -253,14 +284,18 @@ router.post("/mark", checkRole, async (req, res) => {
     fs.writeFileSync(attendancePath, JSON.stringify(localAttendance.sort((a,b) => b.timestamp - a.timestamp), null, 2));
 
     // 1. Attempt Blockchain Record
+    let blockchainError = null;
     try {
       console.log(`⛓️ BLOCKCHAIN: Recording attendance for ${idToMark}...`);
-      const tx = await withTimeout(contract.markAttendance(idToMark), 8000);
+      console.log(`⛓️ BLOCKCHAIN: RPC_URL = ${process.env.RPC_URL}, CONTRACT = ${process.env.CONTRACT_ADDRESS}`);
+      const tx = await withTimeout(contract.markAttendance(idToMark), 15000);
       attendanceRecord.txHash = tx.hash;
       attendanceRecord.status = "confirmed";
       console.log(`✅ BLOCKCHAIN: Confirmed (Hash: ${tx.hash.slice(0, 10)}...)`);
     } catch (bcError) {
-      console.warn(`⚠️ BLOCKCHAIN: Sync failed or timed out: ${bcError.message}`);
+      blockchainError = bcError.message;
+      console.error(`❌ BLOCKCHAIN: Failed — RPC_URL=${process.env.RPC_URL}`);
+      console.error(`❌ BLOCKCHAIN: Error: ${bcError.message}`);
       attendanceRecord.status = "pending";
       // txHash remains the temp "local_" hash
     }
@@ -295,7 +330,7 @@ router.post("/mark", checkRole, async (req, res) => {
         message: `Attendance recorded for ${currentSession} (Blockchain Pending/Local Only)`,
         txHash: attendanceRecord.txHash,
         status: "pending",
-        warning: "Blockchain connection unstable. Record saved to cloud sync only."
+        warning: `Blockchain unreachable (${blockchainError || 'unknown error'}). Check that Hardhat node is running at ${process.env.RPC_URL}. Record saved to cloud sync only.`
       });
     }
 
@@ -366,7 +401,9 @@ router.get("/all", async (req, res) => {
       records = [...records, ...pendingLocal];
     }
 
-    return res.json(records.sort((a,b) => b.timestamp - a.timestamp));
+    // Flag proxy records before returning
+    const flagged = flagProxyRecords(records);
+    return res.json(flagged.sort((a,b) => b.timestamp - a.timestamp));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -393,7 +430,9 @@ router.get("/my/:rollNo", async (req, res) => {
     const pendingLocal = localMetadata.filter(m => !existingHashes.has(m.txHash));
     records = [...records, ...pendingLocal];
 
-    return res.json(records.sort((a,b) => b.timestamp - a.timestamp));
+    // Flag proxy records before returning
+    const flagged = flagProxyRecords(records);
+    return res.json(flagged.sort((a,b) => b.timestamp - a.timestamp));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

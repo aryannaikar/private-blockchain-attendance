@@ -34,13 +34,15 @@ const AdminDashboard = () => {
   const weeklyData = ['Mon','Tue','Wed','Thu','Fri'].map(day => ({
     name: day,
     records: records.filter(r => {
-      if (!r.timestamp) return false;
-      const d = new Date(r.timestamp * 1000).getDay();
+      if (!r.timestamp || r.proxyDetected) return false;
+      // timestamp is already in ms (from Date.now()), do NOT multiply by 1000
+      const d = new Date(r.timestamp).getDay();
       return { Mon:1,Tue:2,Wed:3,Thu:4,Fri:5 }[day] === d;
     }).length,
   }));
 
-  const uniqueStudents = [...new Set(records.map(r => r.studentID))].length;
+  const validRecords = records.filter(r => !r.proxyDetected);
+  const uniqueStudents = [...new Set(validRecords.map(r => r.studentID))].length;
 
   return (
     <div className="dashboard-layout">
@@ -69,7 +71,7 @@ const AdminDashboard = () => {
           transition={{ duration: 0.5 }}
         >
           <StatsCard title="Unique Students"  value={loading ? '…' : uniqueStudents}  icon={GraduationCap} color="#00D2FF" />
-          <StatsCard title="Total Records"    value={loading ? '…' : records.length}  icon={Activity}      color="#00F260" />
+          <StatsCard title="Total Records"    value={loading ? '…' : validRecords.length}  icon={Activity}      color="#00F260" />
           <StatsCard title="Chain ID"         value={loading ? '…' : chainId}         icon={Database}      color="#FBBF24" />
           <StatsCard title="Latest Block"     value={loading ? '…' : `#${blockNumber}`} icon={Database}    color="#FF4E50" />
         </motion.div>

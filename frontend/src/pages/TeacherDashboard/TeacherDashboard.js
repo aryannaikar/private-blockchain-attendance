@@ -53,7 +53,8 @@ const TeacherDashboard = () => {
 
   useEffect(() => { load(); }, [load]);
 
-  const unique = [...new Set(records.map(r => r.studentID))].length;
+  const unique = [...new Set(records.filter(r => !r.proxyDetected).map(r => r.studentID))].length;
+  const validRecords = records.filter(r => !r.proxyDetected);
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -103,7 +104,7 @@ const TeacherDashboard = () => {
           <div className="col-3">
             <div className="stat-card glass-card">
               <div className="stat-label">Total Records</div>
-              <div className="stat-value">{loading ? '…' : records.length}</div>
+              <div className="stat-value">{loading ? '…' : validRecords.length}</div>
             </div>
           </div>
           <div className="col-3">

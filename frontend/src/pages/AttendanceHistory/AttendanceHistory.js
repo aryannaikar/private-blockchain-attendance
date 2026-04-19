@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { RefreshCw, AlertCircle, ShieldCheck, Clock, Archive, Filter, X } from 'lucide-react';
+import { RefreshCw, AlertCircle, ShieldCheck, Clock, Archive, Filter, X, Download } from 'lucide-react';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import AttendanceTable from '../../components/AttendanceTable/AttendanceTable';
 import { getAllAttendance, getMyAttendance } from '../../services/api';
@@ -41,7 +41,8 @@ const AttendanceHistory = () => {
           blockNumber:    r.blockNumber || '—',
           deviceID:       r.deviceID || '—',
           markedBy:       r.markedBy,
-          status:         r.status
+          status:         r.status,
+          proxyDetected:  r.proxyDetected || false
         };
       });
 
@@ -68,8 +69,48 @@ const AttendanceHistory = () => {
     });
   }, [records, filterTeacher, filterClass, filterDay]);
 
-  const onChainCount = filteredRecords.filter(r => r.blockNumber && r.blockNumber !== '—').length;
-  const localCount   = filteredRecords.length - onChainCount;
+  const validRecords  = filteredRecords.filter(r => !r.proxyDetected);
+  const proxyCount     = filteredRecords.filter(r => r.proxyDetected).length;
+  const onChainCount   = validRecords.filter(r => r.blockNumber && r.blockNumber !== '—').length;
+  const localCount     = validRecords.length - onChainCount;
+
+  // Export valid records as CSV (opens in Excel)
+  const exportToExcel = () => {
+    if (validRecords.length === 0) return;
+
+    const headers = ['Student ID', 'Class Slot', 'Teacher', 'Date', 'Time', 'Device ID', 'Status'];
+    const rows = validRecords.map(r => {
+      const date = r.timestamp ? new Date(r.timestamp).toLocaleDateString() : '—';
+      const time = r.timestamp ? new Date(r.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
+      const status = (r.blockNumber && r.blockNumber !== '—') ? `On-Chain #${r.blockNumber}` : 'Local';
+      return [
+        r.studentID,
+        r.sessionID,
+        r.teacherName,
+        date,
+        time,
+        r.deviceID,
+        status
+      ];
+    });
+
+    // Build CSV content with BOM for Excel UTF-8 compatibility
+    const csvContent = '\uFEFF' + [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.download = `attendance_${dateStr}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="dashboard-layout">
@@ -89,6 +130,10 @@ const AttendanceHistory = () => {
             </p>
           </div>
           <div className="header-actions">
+            <button className="btn-premium-refresh" onClick={exportToExcel} disabled={validRecords.length === 0} title="Download valid records as Excel">
+              <Download size={18} />
+              <span>Export Excel</span>
+            </button>
             <button className="btn-premium-refresh" onClick={loadRecords} disabled={loading}>
               <RefreshCw size={18} className={loading ? 'spin' : ''} />
               <span>{loading ? 'Refreshing...' : 'Sync Data'}</span>
@@ -130,7 +175,7 @@ const AttendanceHistory = () => {
         <div className="summary-stats-row">
           <div className="stat-pill-modern">
             <Archive size={16} />
-            <span>Records: <strong>{filteredRecords.length}</strong></span>
+            <span>Valid Records: <strong>{validRecords.length}</strong></span>
           </div>
           <div className="stat-pill-modern blockchain">
             <ShieldCheck size={16} />
@@ -140,6 +185,12 @@ const AttendanceHistory = () => {
             <Clock size={16} />
             <span>Local: <strong>{localCount}</strong></span>
           </div>
+          {proxyCount > 0 && (
+            <div className="stat-pill-modern" style={{ background: 'rgba(239,68,68,0.15)', color: '#EF4444' }}>
+              <AlertCircle size={16} />
+              <span>Proxy (Excluded): <strong>{proxyCount}</strong></span>
+            </div>
+          )}
         </div>
 
         {error && (
